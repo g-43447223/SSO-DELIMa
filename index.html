@@ -122,7 +122,7 @@
         </div>
 
         <button id="btnLogin" onclick="loginDelima()" disabled class="w-full mt-6 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 disabled:shadow-none flex items-center justify-center gap-2 transition duration-200 disabled:cursor-not-allowed">
-          <i data-lucide="external-link" class="w-5 h-5"></i>
+          <i data-lucide="key" class="w-5 h-5"></i>
           <span>LOG MASUK DELIMA 3.0</span>
         </button>
       </div>
@@ -141,7 +141,7 @@
           <div class="border border-white/20 rounded-xl p-4 backdrop-blur-md bg-white/5 space-y-3 text-xs leading-relaxed text-blue-50">
             <p>Portal Smart SSO Gateway ini menyediakan akses pantas ke **Portal DELIMa 3.0 KPM** rasmi bagi murid SK Pulau Indah.</p>
             <hr class="border-dashed border-white/20">
-            <p>💡 **Petua Mudah:** Apabila anda menekan butang <span class="font-bold text-white">LOG MASUK DELIMA 3.0</span>, e-mel murid akan disalin secara automatik. Anda hanya perlu **Paste / Tampal** e-mel tersebut di borang log masuk KPM.</p>
+            <p>Sila pastikan anda memilih <span class="font-bold text-white">Tahun</span>, <span class="font-bold text-white">Kelas</span>, dan <span class="font-bold text-white">Nama Murid</span> yang betul sebelum menekan butang <span class="font-bold text-white">LOG MASUK DELIMA 3.0</span>.</p>
           </div>
         </div>
 
@@ -165,7 +165,7 @@
     lucide.createIcons();
     
     // GANTIKAN DENGAN WEB APP URL ANDA DARIPADA GOOGLE APPS SCRIPT
-    const GAS_API_URL = "TAMPAL_WEB_APP_URL_SEBENAR_DI_SINI";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzjL-uWv1mee1PfSRHl2wIp4mfdw_7Vz2_r6k4mnROTHc9iFKKdYXY4qKk6fEZV2Kd87A/exec";
     
     let dbData = {};
 
@@ -286,18 +286,12 @@
       document.getElementById('btnLogin').disabled = !this.value;
     });
 
-    // Pautan Log Masuk DELIMa 3.0 Beserta Auto-Copy Email
+    // Pautan Direct Google Account Chooser (Isi Emel Otomatik)
     function loginDelima() {
       let email = document.getElementById('murid').value;
       if (email) {
-        // Salin ID DELIMa ke papan klip
-        navigator.clipboard.writeText(email).then(() => {
-          alert("E-mel DELIMa (" + email + ") telah disalin!\n\nPortal DELIMa 3.0 akan dibuka. Sila 'Paste' (Tampal) e-mel ini semasa log masuk.");
-          window.open("https://d3.delima.edu.my/landing", "_blank");
-        }).catch(() => {
-          // Jika clipboard disekat oleh pelayar
-          window.open("https://d3.delima.edu.my/landing", "_blank");
-        });
+        let googleAccountChooserUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email);
+        window.open(googleAccountChooserUrl, '_blank');
       }
     }
   </script>
