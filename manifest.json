@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Smart SSO Gateway DELIMa 3.0",
+  "version": "1.0",
+  "description": "Portal Akses Pantas DELIMa 3.0 SK Pulau Indah",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "logo.png"
+  },
+  "permissions": []
+}
