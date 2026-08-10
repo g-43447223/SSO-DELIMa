@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart SSO Gateway - Portal DELIMa SK Pulau Indah</title>
+  <title>Smart SSO Gateway - Portal DELIMa 3.0 SK Pulau Indah</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -55,22 +55,20 @@
   <!-- Header -->
   <header class="w-full max-w-5xl mx-auto px-4 py-4 flex items-center justify-between z-10">
     <div class="flex items-center gap-3">
-      <!-- Logo Sekolah Dari GitHub Repo (logo.png) -->
-      <img src="LOGO-SEKOLAH.png" 
+      <img src="logo.png" 
            alt="Logo SK Pulau Indah" 
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/50?text=LOGO';"
+           onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>';"
            class="w-10 h-10 object-contain drop-shadow">
            
       <div>
         <h1 class="font-bold text-base sm:text-lg leading-tight tracking-wide text-blue-700 dark:text-blue-400">SMART SSO GATEWAY</h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Portal DELIMa SK Pulau Indah</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Portal DELIMa 3.0 SK Pulau Indah</p>
       </div>
     </div>
 
     <div class="flex items-center gap-3">
-      <!-- Gambar Developer Dari GitHub Repo (developer.jpg) -->
       <div class="hidden sm:flex items-center gap-2.5 bg-white/50 dark:bg-slate-800/50 backdrop-blur px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs shadow-sm">
-        <img src="304.png" 
+        <img src="developer.jpg" 
              alt="Sir Fahmi Rahim" 
              onerror="this.onerror=null; this.src='https://via.placeholder.com/40?text=DEV';"
              class="w-7 h-7 rounded-full object-cover border border-blue-500/50">
@@ -95,13 +93,8 @@
       <div class="p-6 sm:p-8 flex flex-col justify-between">
         <div>
           <div class="text-center mb-6">
-            <img src="LOGO-SEKOLAH.png" 
-                 alt="Logo SK Pulau Indah" 
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/80?text=LOGO';"
-                 class="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md">
-                 
-            <h2 class="text-xl font-bold text-slate-800 dark:text-white">Smart SSO Gateway</h2>
-            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">Portal DELIMa - SK Pulau Indah</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Smart SSO Gateway</h2>
+            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">Portal DELIMa 3.0 - SK Pulau Indah</p>
           </div>
 
           <div class="space-y-3">
@@ -129,8 +122,8 @@
         </div>
 
         <button id="btnLogin" onclick="loginDelima()" disabled class="w-full mt-6 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 disabled:shadow-none flex items-center justify-center gap-2 transition duration-200 disabled:cursor-not-allowed">
-          <i data-lucide="key" class="w-5 h-5"></i>
-          <span>LOG MASUK DELIMA</span>
+          <i data-lucide="external-link" class="w-5 h-5"></i>
+          <span>LOG MASUK DELIMA 3.0</span>
         </button>
       </div>
 
@@ -146,9 +139,9 @@
           </div>
 
           <div class="border border-white/20 rounded-xl p-4 backdrop-blur-md bg-white/5 space-y-3 text-xs leading-relaxed text-blue-50">
-            <p>Portal Smart SSO Gateway ini menyediakan akses terus pantas ke Portal DELIMa KPM rasmi bagi setiap murid SK Pulau Indah melalui pengesahan akaun DELIMa KPM.</p>
+            <p>Portal Smart SSO Gateway ini menyediakan akses pantas ke **Portal DELIMa 3.0 KPM** rasmi bagi murid SK Pulau Indah.</p>
             <hr class="border-dashed border-white/20">
-            <p>Sila pastikan anda memilih <span class="font-bold text-white">Tahun</span>, <span class="font-bold text-white">Kelas</span>, dan <span class="font-bold text-white">Nama Murid</span> yang betul sebelum menekan butang <span class="font-bold text-white">LOG MASUK DELIMA</span>.</p>
+            <p>💡 **Petua Mudah:** Apabila anda menekan butang <span class="font-bold text-white">LOG MASUK DELIMA 3.0</span>, e-mel murid akan disalin secara automatik. Anda hanya perlu **Paste / Tampal** e-mel tersebut di borang log masuk KPM.</p>
           </div>
         </div>
 
@@ -172,7 +165,7 @@
     lucide.createIcons();
     
     // GANTIKAN DENGAN WEB APP URL ANDA DARIPADA GOOGLE APPS SCRIPT
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzjL-uWv1mee1PfSRHl2wIp4mfdw_7Vz2_r6k4mnROTHc9iFKKdYXY4qKk6fEZV2Kd87A/exec";
+    const GAS_API_URL = "TAMPAL_WEB_APP_URL_SEBENAR_DI_SINI";
     
     let dbData = {};
 
@@ -293,13 +286,18 @@
       document.getElementById('btnLogin').disabled = !this.value;
     });
 
-    // Pautan Lencongan Pintas Rasmi ke Portal DELIMa
+    // Pautan Log Masuk DELIMa 3.0 Beserta Auto-Copy Email
     function loginDelima() {
       let email = document.getElementById('murid').value;
       if (email) {
-        let delimaUrl = "https://d3.delima.edu.my/";
-        let redirectUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email) + "&continue=" + encodeURIComponent(delimaUrl);
-        window.open(redirectUrl, '_blank');
+        // Salin ID DELIMa ke papan klip
+        navigator.clipboard.writeText(email).then(() => {
+          alert("E-mel DELIMa (" + email + ") telah disalin!\n\nPortal DELIMa 3.0 akan dibuka. Sila 'Paste' (Tampal) e-mel ini semasa log masuk.");
+          window.open("https://d3.delima.edu.my/landing", "_blank");
+        }).catch(() => {
+          // Jika clipboard disekat oleh pelayar
+          window.open("https://d3.delima.edu.my/landing", "_blank");
+        });
       }
     }
   </script>
