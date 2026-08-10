@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart SSO Gateway - DELIMa</title>
+  <title>Smart SSO Gateway - Portal DELIMa SK Pulau Indah</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -55,24 +55,24 @@
   <!-- Header -->
   <header class="w-full max-w-5xl mx-auto px-4 py-4 flex items-center justify-between z-10">
     <div class="flex items-center gap-3">
-      <!-- PAUTAN LOGO SEKOLAH (Direct Image URL / ImgBB) -->
-      <img src="https://i.postimg.cc/placeholder/logo.png" 
-           alt="Logo Sekolah" 
-           onerror="this.src='https://via.placeholder.com/50?text=LOGO';"
+      <!-- Logo Sekolah Dari GitHub Repo (logo.png) -->
+      <img src="logo.png" 
+           alt="Logo SK Pulau Indah" 
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/50?text=LOGO';"
            class="w-10 h-10 object-contain drop-shadow">
            
       <div>
         <h1 class="font-bold text-base sm:text-lg leading-tight tracking-wide text-blue-700 dark:text-blue-400">SMART SSO GATEWAY</h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">DELIMa SK Pulau Indah</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Portal DELIMa SK Pulau Indah</p>
       </div>
     </div>
 
     <div class="flex items-center gap-3">
-      <!-- PAUTAN GAMBAR DEVELOPER -->
+      <!-- Gambar Developer Dari GitHub Repo (developer.jpg) -->
       <div class="hidden sm:flex items-center gap-2.5 bg-white/50 dark:bg-slate-800/50 backdrop-blur px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs shadow-sm">
-        <img src="https://via.placeholder.com/40?text=DEV" 
-             alt="Developer Profile" 
-             onerror="this.src='https://via.placeholder.com/40?text=DEV';"
+        <img src="developer.jpg" 
+             alt="Sir Fahmi Rahim" 
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/40?text=DEV';"
              class="w-7 h-7 rounded-full object-cover border border-blue-500/50">
         
         <div class="flex flex-col text-left leading-tight">
@@ -95,20 +95,20 @@
       <div class="p-6 sm:p-8 flex flex-col justify-between">
         <div>
           <div class="text-center mb-6">
-            <img src="https://i.postimg.cc/placeholder/logo.png" 
-                 alt="Logo Sekolah" 
-                 onerror="this.src='https://via.placeholder.com/80?text=LOGO';"
+            <img src="logo.png" 
+                 alt="Logo SK Pulau Indah" 
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/80?text=LOGO';"
                  class="w-20 h-20 object-contain mx-auto mb-3 drop-shadow-md">
                  
             <h2 class="text-xl font-bold text-slate-800 dark:text-white">Smart SSO Gateway</h2>
-            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">DELIMa - SK Pulau Indah</p>
+            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">Portal DELIMa - SK Pulau Indah</p>
           </div>
 
           <div class="space-y-3">
             <div>
               <label for="tahun" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">1. Pilih Tahun / Tingkatan:</label>
               <select id="tahun" onchange="updateKelasDropdown()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm transition">
-                <option value="">-- Memuatkan Data... --</option>
+                <option value="">⌛ Sedang memuatkan data murid...</option>
               </select>
             </div>
 
@@ -128,9 +128,9 @@
           </div>
         </div>
 
-        <button id="btnLogin" onclick="loginGoogleClassroom()" disabled class="w-full mt-6 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 disabled:shadow-none flex items-center justify-center gap-2 transition duration-200 disabled:cursor-not-allowed">
+        <button id="btnLogin" onclick="loginDelima()" disabled class="w-full mt-6 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 disabled:shadow-none flex items-center justify-center gap-2 transition duration-200 disabled:cursor-not-allowed">
           <i data-lucide="key" class="w-5 h-5"></i>
-          <span>LOG MASUK</span>
+          <span>LOG MASUK DELIMA</span>
         </button>
       </div>
 
@@ -146,9 +146,9 @@
           </div>
 
           <div class="border border-white/20 rounded-xl p-4 backdrop-blur-md bg-white/5 space-y-3 text-xs leading-relaxed text-blue-50">
-            <p>Portal Smart SSO Gateway ini menyediakan akses terus pantas ke akaun DELIMa bagi setiap murid SK Pulau Indah melalui pengesahan akaun DELIMa KPM.</p>
+            <p>Portal Smart SSO Gateway ini menyediakan akses terus pantas ke Portal DELIMa KPM rasmi bagi setiap murid SK Pulau Indah melalui pengesahan akaun DELIMa KPM.</p>
             <hr class="border-dashed border-white/20">
-            <p>Sila pastikan anda memilih <span class="font-bold text-white">Tahun</span>, <span class="font-bold text-white">Kelas</span>, dan <span class="font-bold text-white">Nama Murid</span> yang betul sebelum menekan butang <span class="font-bold text-white">LOG MASUK</span>.</p>
+            <p>Sila pastikan anda memilih <span class="font-bold text-white">Tahun</span>, <span class="font-bold text-white">Kelas</span>, dan <span class="font-bold text-white">Nama Murid</span> yang betul sebelum menekan butang <span class="font-bold text-white">LOG MASUK DELIMA</span>.</p>
           </div>
         </div>
 
@@ -171,7 +171,7 @@
   <script>
     lucide.createIcons();
     
-    // GANTIKAN DENGAN URL WEB APP APPS SCRIPT ANDA
+    // GANTIKAN DENGAN WEB APP URL ANDA DARIPADA GOOGLE APPS SCRIPT
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzjL-uWv1mee1PfSRHl2wIp4mfdw_7Vz2_r6k4mnROTHc9iFKKdYXY4qKk6fEZV2Kd87A/exec";
     
     let dbData = {};
@@ -207,25 +207,39 @@
       }
     })();
 
-    // Memuatkan data JSON dari Apps Script menggunakan Fetch API
     window.onload = function() {
+      const tahunSelect = document.getElementById('tahun');
+
+      if (!GAS_API_URL || GAS_API_URL.includes("TAMPAL_WEB_APP_URL")) {
+        tahunSelect.innerHTML = '<option value="">⚠️ Sila masukkan URL Web App dalam kod dahulu!</option>';
+        return;
+      }
+
       fetch(GAS_API_URL)
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) throw new Error("Gagal menyambung ke server");
+          return response.json();
+        })
         .then(data => {
           dbData = data;
-          let tahunSelect = document.getElementById('tahun');
           tahunSelect.innerHTML = '<option value="">-- Sila Pilih Tahun --</option>';
           
-          for (let tahun in dbData) {
+          const keys = Object.keys(dbData);
+          if (keys.length === 0) {
+            tahunSelect.innerHTML = '<option value="">⚠️ Tiada data dijumpai dalam Google Sheet</option>';
+            return;
+          }
+
+          keys.forEach(tahun => {
             let opt = document.createElement('option');
             opt.value = tahun;
             opt.innerHTML = tahun;
             tahunSelect.appendChild(opt);
-          }
+          });
         })
         .catch(err => {
           console.error("Gagal memuatkan API:", err);
-          document.getElementById('tahun').innerHTML = '<option value="">-- Gagal Memuat Data --</option>';
+          tahunSelect.innerHTML = '<option value="">❌ Gagal memuatkan data. Sila muat semula laman.</option>';
         });
     };
 
@@ -279,11 +293,12 @@
       document.getElementById('btnLogin').disabled = !this.value;
     });
 
-    function loginGoogleClassroom() {
+    // Pautan Lencongan Pintas Rasmi ke Portal DELIMa
+    function loginDelima() {
       let email = document.getElementById('murid').value;
       if (email) {
-        let classroomUrl = "https://classroom.google.com";
-        let redirectUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email) + "&continue=" + encodeURIComponent(classroomUrl);
+        let delimaUrl = "https://delima.moe-dl.edu.my";
+        let redirectUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email) + "&continue=" + encodeURIComponent(delimaUrl);
         window.open(redirectUrl, '_blank');
       }
     }
