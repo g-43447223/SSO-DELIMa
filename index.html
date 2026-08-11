@@ -205,7 +205,7 @@
     lucide.createIcons();
     
     // GANTIKAN DENGAN WEB APP URL ANDA DARIPADA GOOGLE APPS SCRIPT
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzjL-uWv1mee1PfSRHl2wIp4mfdw_7Vz2_r6k4mnROTHc9iFKKdYXY4qKk6fEZV2Kd87A/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw9LMu0nQ6IjAJW_4pmZ2pSQN6xwuNXBLxHCAjpqRPDD5Le5TobbKV5jIljt4wIZHko4w/exec";
     
     let dbData = {};
 
@@ -347,14 +347,29 @@
       document.querySelectorAll('.btn-target').forEach(btn => btn.disabled = true);
     }
 
-    // Pemprosesan Klik Butang Sasaran
+    // Pemprosesan Klik Butang Sasaran dengan Tracking
     document.querySelectorAll('.btn-target').forEach(btn => {
       btn.addEventListener('click', function() {
-        let email = document.getElementById('murid').value;
+        let tahun = document.getElementById('tahun').value;
+        let kelas = document.getElementById('kelas').value;
+        let muridSelect = document.getElementById('murid');
+        let email = muridSelect.value;
+        let nama = muridSelect.options[muridSelect.selectedIndex].textContent;
         let targetKey = this.getAttribute('data-target');
         let targetUrl = APP_URLS[targetKey];
 
         if (!email || !targetUrl) return;
+
+        // Hantar Data Log ke Google Sheets
+        let logUrl = GAS_API_URL + "?action=log" +
+          "&tahun=" + encodeURIComponent(tahun) +
+          "&kelas=" + encodeURIComponent(kelas) +
+          "&nama=" + encodeURIComponent(nama) +
+          "&email=" + encodeURIComponent(email) +
+          "&app=" + encodeURIComponent(targetKey) +
+          "&source=Web App";
+
+        fetch(logUrl, { mode: 'no-cors' }).catch(() => {});
 
         // Auto copy email ke clipboard
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -362,11 +377,9 @@
         }
 
         if (targetKey === 'classroom' || targetKey === 'gmail') {
-          // Produk Google Native
           let redirectUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email) + "&continue=" + encodeURIComponent(targetUrl);
           window.open(redirectUrl, '_blank');
         } else {
-          // Portal Luar (DELIMa 3.0, AINS, Canva)
           let googleChooserUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email);
           window.open(googleChooserUrl, '_blank');
           setTimeout(() => {
