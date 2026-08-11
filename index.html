@@ -204,6 +204,9 @@
   <script>
     lucide.createIcons();
     
+    <script>
+    lucide.createIcons();
+    
     // GANTIKAN DENGAN WEB APP URL ANDA DARIPADA GOOGLE APPS SCRIPT
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz8UCKh3OyzTbnQ0mirQGSK1QRk9LtLZ05ReWwD4HqYp_oeAFKlrQmV1zv60-8bLZ6KPg/exec";
     
@@ -347,7 +350,7 @@
       document.querySelectorAll('.btn-target').forEach(btn => btn.disabled = true);
     }
 
-    // Pemprosesan Klik Butang Sasaran dengan Tracking
+    // Pemprosesan Klik Butang Sasaran dengan Tracking & Anti-Pop-up Blocker
     document.querySelectorAll('.btn-target').forEach(btn => {
       btn.addEventListener('click', function() {
         let tahun = document.getElementById('tahun').value;
@@ -360,7 +363,7 @@
 
         if (!email || !targetUrl) return;
 
-        // Hantar Data Log ke Google Sheets
+        // 1. Rekod Log ke Google Sheets
         let logUrl = GAS_API_URL + "?action=log" +
           "&tahun=" + encodeURIComponent(tahun) +
           "&kelas=" + encodeURIComponent(kelas) +
@@ -371,20 +374,25 @@
 
         fetch(logUrl, { mode: 'no-cors' }).catch(() => {});
 
-        // Auto copy email ke clipboard
+        // 2. Salin e-mel ke papan klip automatik
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(email).catch(() => {});
         }
 
+        // 3. Buka Tab Sasaran
         if (targetKey === 'classroom' || targetKey === 'gmail') {
+          // Google Native Apps: Direct Redirect
           let redirectUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email) + "&continue=" + encodeURIComponent(targetUrl);
           window.open(redirectUrl, '_blank');
         } else {
+          // Portal Luar (DELIMa 3.0, AINS, Canva)
           let googleChooserUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email);
+          
+          // Buka Portal Sasaran Dulu
+          window.open(targetUrl, '_blank');
+          
+          // Buka Log Masuk Google di Tab Satu Lagi
           window.open(googleChooserUrl, '_blank');
-          setTimeout(() => {
-            window.open(targetUrl, '_blank');
-          }, 300);
         }
       });
     });
