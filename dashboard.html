@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ms" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Analisis - Hub Akses Digital SKPI</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans p-4 sm:p-8">
+
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-800">
+    <div>
+      <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2">
+        <i data-lucide="layout-dashboard"></i> DASHBOARD ANALISIS PENGGUNAAN
+      </h1>
+      <p class="text-xs text-slate-400 mt-1">Hub Akses Digital & Extension SSO • SK Pulau Indah</p>
+    </div>
+    
+    <button onclick="fetchAnalyticsData()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold rounded-xl flex items-center gap-2 shadow-lg transition">
+      <i data-lucide="refresh-cw" class="w-4 h-4"></i> Muat Semula Data
+    </button>
+  </header>
+
+  <main class="max-w-7xl mx-auto space-y-6">
+
+    <!-- KPI Ringkasan Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Jumlah Akses</span>
+          <div id="totalLogins" class="text-3xl font-extrabold text-white mt-1">0</div>
+        </div>
+        <div class="p-3 bg-blue-500/10 rounded-xl text-blue-400"><i data-lucide="mouse-pointer-click"></i></div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pengguna Unik</span>
+          <div id="uniqueUsers" class="text-3xl font-extrabold text-emerald-400 mt-1">0</div>
+        </div>
+        <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400"><i data-lucide="users"></i></div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Aplikasi Popular</span>
+          <div id="topApp" class="text-lg font-bold text-amber-400 mt-1 truncate max-w-[150px]">-</div>
+        </div>
+        <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400"><i data-lucide="trophy"></i></div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Nisbah Platform</span>
+          <div id="platformRatio" class="text-xs font-semibold text-slate-300 mt-1">Web: 0 | Ext: 0</div>
+        </div>
+        <div class="p-3 bg-indigo-500/10 rounded-xl text-indigo-400"><i data-lucide="monitor"></i></div>
+      </div>
+
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Chart: Popularitas Aplikasi -->
+      <div class="lg:col-span-5 bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
+        <h3 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-blue-400"></i> Pecahan Mengikut Aplikasi
+        </h3>
+        <div class="relative h-64">
+          <canvas id="appChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart: Penglibatan Mengikut Tahun -->
+      <div class="lg:col-span-7 bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
+        <h3 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
+          <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i> Penglibatan Mengikut Tahun / Tingkatan
+        </h3>
+        <div class="relative h-64">
+          <canvas id="yearChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Log Aktiviti Terkini Table -->
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+      <h3 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
+        <i data-lucide="history" class="w-4 h-4 text-amber-400"></i> Rekod Log Masuk Terkini
+      </h3>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-800/60 text-slate-400 uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="p-3">Masa</th>
+              <th class="p-3">Nama Murid</th>
+              <th class="p-3">Tahun & Kelas</th>
+              <th class="p-3">Aplikasi Sasaran</th>
+              <th class="p-3">Platform</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody" class="divide-y divide-slate-800/50">
+            <tr>
+              <td colspan="5" class="p-4 text-center text-slate-500">⌛ Memuatkan data log...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // GANTIKAN DENGAN WEB APP URL ANDA DARIPADA GOOGLE APPS SCRIPT
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw9LMu0nQ6IjAJW_4pmZ2pSQN6xwuNXBLxHCAjpqRPDD5Le5TobbKV5jIljt4wIZHko4w/exec";
+
+    let appChartInstance = null;
+    let yearChartInstance = null;
+
+    window.onload = fetchAnalyticsData;
+
+    function fetchAnalyticsData() {
+      if (!GAS_API_URL || GAS_API_URL.includes("TAMPAL_WEB_APP_URL")) {
+        alert("Sila masukkan URL Google Apps Script yang betul dalam dashboard.html!");
+        return;
+      }
+
+      fetch(GAS_API_URL + "?action=analytics")
+        .then(res => res.json())
+        .then(data => {
+          processAnalytics(data.logs || []);
+        })
+        .catch(err => {
+          console.error("Gagal mengambil data:", err);
+        });
+    }
+
+    function processAnalytics(logs) {
+      document.getElementById('totalLogins').textContent = logs.length;
+
+      // Unique Users
+      const uniqueEmails = new Set(logs.map(l => l.email));
+      document.getElementById('uniqueUsers').textContent = uniqueEmails.size;
+
+      // Aggregations
+      const appCounts = {};
+      const yearCounts = {};
+      let webCount = 0;
+      let extCount = 0;
+
+      logs.forEach(l => {
+        // App Counts
+        let appName = l.app.toUpperCase();
+        appCounts[appName] = (appCounts[appName] || 0) + 1;
+
+        // Year Counts
+        let yearName = l.tahun || "Lain-lain";
+        yearCounts[yearName] = (yearCounts[yearName] || 0) + 1;
+
+        // Source Counts
+        if (l.source === "Extension") extCount++;
+        else webCount++;
+      });
+
+      // Top App
+      let topApp = "-";
+      let maxAppCount = 0;
+      for (let app in appCounts) {
+        if (appCounts[app] > maxAppCount) {
+          maxAppCount = appCounts[app];
+          topApp = app;
+        }
+      }
+      document.getElementById('topApp').textContent = topApp;
+      document.getElementById('platformRatio').textContent = `Web: ${webCount} | Ext: ${extCount}`;
+
+      // Render Charts
+      renderAppChart(appCounts);
+      renderYearChart(yearCounts);
+
+      // Render Table (Tunjuk 15 log terkini)
+      renderLogTable(logs.reverse().slice(0, 15));
+    }
+
+    function renderAppChart(appData) {
+      const ctx = document.getElementById('appChart').getContext('2d');
+      if (appChartInstance) appChartInstance.destroy();
+
+      appChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(appData),
+          datasets: [{
+            data: Object.values(appData),
+            backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    function renderYearChart(yearData) {
+      const ctx = document.getElementById('yearChart').getContext('2d');
+      if (yearChartInstance) yearChartInstance.destroy();
+
+      yearChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(yearData),
+          datasets: [{
+            label: 'Jumlah Akses',
+            data: Object.values(yearData),
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderLogTable(logs) {
+      const tbody = document.getElementById('logTableBody');
+      tbody.innerHTML = '';
+
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Tiada log rekod lagi.</td></tr>';
+        return;
+      }
+
+      logs.forEach(l => {
+        let dateObj = new Date(l.masa);
+        let timeStr = dateObj.toLocaleDateString('ms-MY') + ' ' + dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+
+        let tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/30 transition";
+        tr.innerHTML = `
+          <td class="p-3 text-slate-400">${timeStr}</td>
+          <td class="p-3 font-semibold text-white">${l.nama}</td>
+          <td class="p-3">${l.tahun} - ${l.kelas}</td>
+          <td class="p-3 font-bold text-blue-400 uppercase">${l.app}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${l.source === 'Extension' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'}">${l.source}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
