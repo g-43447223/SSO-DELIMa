@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart SSO Gateway - Portal DELIMa 3.0 SK Pulau Indah</title>
+  <title>Hub Akses Digital SKPI - Portal SSO</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -29,19 +29,19 @@
   
   <style>
     .glass-card {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.6);
     }
     .dark .glass-card {
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .glass-panel-blue {
-      background: linear-gradient(135deg, rgba(30, 64, 175, 0.85), rgba(37, 99, 235, 0.95));
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(37, 99, 235, 0.95));
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
@@ -49,6 +49,7 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300 flex flex-col justify-between relative overflow-x-hidden">
 
+  <!-- Glow Backgrounds -->
   <div class="fixed -top-24 -left-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
   <div class="fixed -bottom-24 -right-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -56,13 +57,13 @@
   <header class="w-full max-w-5xl mx-auto px-4 py-4 flex items-center justify-between z-10">
     <div class="flex items-center gap-3">
       <img src="logo.png" 
-           alt="Logo SK Pulau Indah" 
+           alt="Logo SKPI" 
            onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>';"
            class="w-10 h-10 object-contain drop-shadow">
            
       <div>
-        <h1 class="font-bold text-base sm:text-lg leading-tight tracking-wide text-blue-700 dark:text-blue-400">SMART SSO GATEWAY</h1>
-        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Portal DELIMa 3.0 SK Pulau Indah</p>
+        <h1 class="font-bold text-base sm:text-lg leading-tight tracking-wide text-blue-700 dark:text-blue-400">HUB AKSES DIGITAL SKPI</h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Portal SSO Pembelajaran SK Pulau Indah</p>
       </div>
     </div>
 
@@ -86,69 +87,108 @@
   </header>
 
   <!-- Main Container -->
-  <main class="w-full max-w-4xl mx-auto px-4 py-6 my-auto z-10">
-    <div class="glass-card rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+  <main class="w-full max-w-5xl mx-auto px-4 py-4 my-auto z-10">
+    <div class="glass-card rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
       
-      <!-- Borang SSO -->
-      <div class="p-6 sm:p-8 flex flex-col justify-between">
+      <!-- Borang SSO Utama -->
+      <div class="p-6 sm:p-8 md:col-span-7 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800">
         <div>
-          <div class="text-center mb-6">
-            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">Smart SSO Gateway</h2>
-            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">Portal DELIMa 3.0 - SK Pulau Indah</p>
+          <div class="mb-5">
+            <h2 class="text-xl font-bold text-slate-800 dark:text-white">Smart SSO Gateway</h2>
+            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-0.5">Pilih maklumat murid untuk membuka pautan aplikasi</p>
           </div>
 
           <div class="space-y-3">
             <div>
               <label for="tahun" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">1. Pilih Tahun / Tingkatan:</label>
-              <select id="tahun" onchange="updateKelasDropdown()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm transition">
+              <select id="tahun" onchange="updateKelasDropdown()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm transition">
                 <option value="">⌛ Sedang memuatkan data murid...</option>
               </select>
             </div>
 
             <div>
               <label for="kelas" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">2. Pilih Kelas:</label>
-              <select id="kelas" onchange="updateStudentDropdown()" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
+              <select id="kelas" onchange="updateStudentDropdown()" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
                 <option value="">-- Sila Pilih Tahun Terlebih Dahulu --</option>
               </select>
             </div>
 
             <div>
               <label for="murid" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">3. Pilih Nama Murid:</label>
-              <select id="murid" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
+              <select id="murid" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
                 <option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>
               </select>
             </div>
           </div>
-        </div>
 
-        <button id="btnLogin" onclick="loginDelima()" disabled class="w-full mt-6 py-3.5 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 disabled:shadow-none flex items-center justify-center gap-2 transition duration-200 disabled:cursor-not-allowed">
-          <i data-lucide="key" class="w-5 h-5"></i>
-          <span>LOG MASUK DELIMA 3.0</span>
-        </button>
+          <!-- ID Display Box -->
+          <div class="mt-4 p-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-center">
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">ID DELIMa Murid:</span>
+            <span id="emailDisplay" class="font-mono text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block break-all">-- Belum Dipilih --</span>
+          </div>
+
+          <!-- Pilihan Aplikasi Destinasi -->
+          <div class="mt-5">
+            <span class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">4. Pilih Aplikasi Sasaran:</span>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <button class="btn-target col-span-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white disabled:text-slate-400 font-bold text-xs rounded-xl shadow-lg shadow-blue-500/20 disabled:shadow-none flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="delima" disabled>
+                <i data-lucide="rocket" class="w-4 h-4"></i>
+                <span>PORTAL DELIMA 3.0</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="classroom" disabled>
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>Classroom</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="ains" disabled>
+                <i data-lucide="library" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>AINS (Nilam)</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="gmail" disabled>
+                <i data-lucide="mail" class="w-3.5 h-3.5 text-red-400"></i>
+                <span>Gmail</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="canva" disabled>
+                <i data-lucide="palette" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Canva</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      <!-- Kad Pengumuman -->
-      <div class="glass-panel-blue p-6 sm:p-8 text-white flex flex-col justify-between">
+      <!-- Kad Informasi & Panduan -->
+      <div class="glass-panel-blue p-6 sm:p-8 md:col-span-5 text-white flex flex-col justify-between">
         <div>
           <div class="text-center mb-6">
             <div class="w-12 h-12 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-2 backdrop-blur">
-              <i data-lucide="key-round" class="w-6 h-6 text-white"></i>
+              <i data-lucide="shield-check" class="w-6 h-6 text-emerald-300"></i>
             </div>
-            <p class="text-[10px] uppercase tracking-widest text-blue-200 font-semibold">SMART SSO GATEWAY</p>
-            <h3 class="text-lg font-bold">PENGUMUMAN SSO</h3>
+            <p class="text-[10px] uppercase tracking-widest text-blue-200 font-semibold">HUB AKSES DIGITAL</p>
+            <h3 class="text-lg font-bold">SK PULAU INDAH</h3>
           </div>
 
           <div class="border border-white/20 rounded-xl p-4 backdrop-blur-md bg-white/5 space-y-3 text-xs leading-relaxed text-blue-50">
-            <p>Portal Smart SSO Gateway ini menyediakan akses pantas ke **Portal DELIMa 3.0 KPM** rasmi bagi murid SK Pulau Indah.</p>
-            <hr class="border-dashed border-white/20">
-            <p>Sila pastikan anda memilih <span class="font-bold text-white">Tahun</span>, <span class="font-bold text-white">Kelas</span>, dan <span class="font-bold text-white">Nama Murid</span> yang betul sebelum menekan butang <span class="font-bold text-white">LOG MASUK DELIMA 3.0</span>.</p>
+            <p>💡 **Panduan Penggunaan:**</p>
+            <ol class="list-decimal list-inside space-y-1.5 opacity-90">
+              <li>Pilih **Tahun**, **Kelas**, dan **Nama Murid**.</li>
+              <li>ID DELIMa akan dipaparkan secara automatik di dalam kotak.</li>
+              <li>Klik mana-mana butang aplikasi sasaran yang diingini.</li>
+            </ol>
+            <hr class="border-dashed border-white/20 my-2">
+            <p class="text-[11px] opacity-80">Sistem akan log masuk akaun Google murid dan membuka portal aplikasi sasaran secara terus.</p>
           </div>
         </div>
 
         <div class="mt-6 text-center">
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 text-xs text-blue-100 font-medium">
-            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
-            <span>KESELAMATAN SMART SSO TERJAMIN</span>
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-[11px] text-blue-100 font-medium">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Sistem SSO Selamat & Pantas</span>
           </div>
         </div>
       </div>
@@ -158,7 +198,7 @@
 
   <footer class="w-full text-center py-4 text-xs text-slate-500 dark:text-slate-400 z-10 px-4">
     <p>Hak Cipta Terpelihara © SK Pulau Indah | Kementerian Pendidikan Malaysia</p>
-    <p class="mt-1">Smart SSO Gateway dibangunkan oleh <span class="font-semibold text-slate-700 dark:text-slate-300">Sir Fahmi Rahim</span>, SK Pulau Indah</p>
+    <p class="mt-1">Hub Akses Digital dibangunkan oleh <span class="font-semibold text-slate-700 dark:text-slate-300">Sir Fahmi Rahim</span></p>
   </footer>
 
   <script>
@@ -168,6 +208,14 @@
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzjL-uWv1mee1PfSRHl2wIp4mfdw_7Vz2_r6k4mnROTHc9iFKKdYXY4qKk6fEZV2Kd87A/exec";
     
     let dbData = {};
+
+    const APP_URLS = {
+      delima: "https://d3.delima.edu.my/landing",
+      classroom: "https://classroom.google.com",
+      ains: "https://ains.moe.gov.my",
+      gmail: "https://mail.google.com",
+      canva: "https://www.canva.com/login"
+    };
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -240,12 +288,11 @@
       let tahun = document.getElementById('tahun').value;
       let kelasSelect = document.getElementById('kelas');
       let muridSelect = document.getElementById('murid');
-      let btn = document.getElementById('btnLogin');
 
       kelasSelect.innerHTML = '<option value="">-- Sila Pilih Kelas --</option>';
       muridSelect.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
       muridSelect.disabled = true;
-      btn.disabled = true;
+      resetStudentSelection();
 
       if (tahun && dbData[tahun]) {
         kelasSelect.disabled = false;
@@ -264,10 +311,9 @@
       let tahun = document.getElementById('tahun').value;
       let kelas = document.getElementById('kelas').value;
       let muridSelect = document.getElementById('murid');
-      let btn = document.getElementById('btnLogin');
       
       muridSelect.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
-      btn.disabled = true;
+      resetStudentSelection();
       
       if (tahun && kelas && dbData[tahun] && dbData[tahun][kelas]) {
         muridSelect.disabled = false;
@@ -282,18 +328,53 @@
       }
     }
 
+    // Papar ID & Hidupkan Butang Aplikasi
     document.getElementById('murid').addEventListener('change', function() {
-      document.getElementById('btnLogin').disabled = !this.value;
+      let email = this.value;
+      let emailDisplay = document.getElementById('emailDisplay');
+      let targetButtons = document.querySelectorAll('.btn-target');
+
+      if (email) {
+        emailDisplay.textContent = email;
+        targetButtons.forEach(btn => btn.disabled = false);
+      } else {
+        resetStudentSelection();
+      }
     });
 
-    // Pautan Direct Google Account Chooser (Isi Emel Otomatik)
-    function loginDelima() {
-      let email = document.getElementById('murid').value;
-      if (email) {
-        let googleAccountChooserUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email);
-        window.open(googleAccountChooserUrl, '_blank');
-      }
+    function resetStudentSelection() {
+      document.getElementById('emailDisplay').textContent = "-- Belum Dipilih --";
+      document.querySelectorAll('.btn-target').forEach(btn => btn.disabled = true);
     }
+
+    // Pemprosesan Klik Butang Sasaran
+    document.querySelectorAll('.btn-target').forEach(btn => {
+      btn.addEventListener('click', function() {
+        let email = document.getElementById('murid').value;
+        let targetKey = this.getAttribute('data-target');
+        let targetUrl = APP_URLS[targetKey];
+
+        if (!email || !targetUrl) return;
+
+        // Auto copy email ke clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(email).catch(() => {});
+        }
+
+        if (targetKey === 'classroom' || targetKey === 'gmail') {
+          // Produk Google Native
+          let redirectUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email) + "&continue=" + encodeURIComponent(targetUrl);
+          window.open(redirectUrl, '_blank');
+        } else {
+          // Portal Luar (DELIMa 3.0, AINS, Canva)
+          let googleChooserUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email);
+          window.open(googleChooserUrl, '_blank');
+          setTimeout(() => {
+            window.open(targetUrl, '_blank');
+          }, 300);
+        }
+      });
+    });
   </script>
 </body>
 </html>
