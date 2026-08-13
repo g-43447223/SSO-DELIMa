@@ -404,29 +404,29 @@
     }
 
     // -----------------------------------------------------------
-    // LOGIK PAUTAN GOOGLE ACCOUNTCHOOSER (BEBAS ERROR 400)
+    // LOGIK REDIRECT RASMI GOOGLE SIGN-IN V3 (BASS-PROOF & BEBAS 400)
     // -----------------------------------------------------------
     function getRedirectUrl(targetKey, email) {
       const encodedEmail = encodeURIComponent(email);
       
       switch (targetKey) {
         case 'delima':
-          return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://d3.delima.edu.my");
+          return "https://accounts.google.com/AccountChooser?login_hint=" + encodedEmail + "&continue=" + encodeURIComponent("https://d3.delima.edu.my");
 
         case 'classroom':
-          return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://classroom.google.com");
+          return "https://accounts.google.com/AccountChooser?login_hint=" + encodedEmail + "&continue=" + encodeURIComponent("https://classroom.google.com");
 
         case 'gmail':
-          return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://mail.google.com");
+          return "https://accounts.google.com/AccountChooser?login_hint=" + encodedEmail + "&continue=" + encodeURIComponent("https://mail.google.com");
 
         case 'canva':
-          return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://www.canva.com/login");
+          return "https://accounts.google.com/AccountChooser?login_hint=" + encodedEmail + "&continue=" + encodeURIComponent("https://www.canva.com/login");
 
         case 'ains':
           return "https://ains.moe.gov.my";
 
         default:
-          return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail;
+          return "https://accounts.google.com/AccountChooser?login_hint=" + encodedEmail;
       }
     }
 
