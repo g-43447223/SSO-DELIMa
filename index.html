@@ -404,14 +404,14 @@
     }
 
     // -----------------------------------------------------------
-// LOGIK REDIRECT DIRECT OAUTH DELIMA 3.0 (PANTAS & TERUS MASUK)
+// LOGIK REDIRECT PANTAS & SELAMAT (MESRA MAKMAL KOMPUTER)
 // -----------------------------------------------------------
 function getRedirectUrl(targetKey, email) {
   const encodedEmail = encodeURIComponent(email);
   
   switch (targetKey) {
     case 'delima':
-      // Direct OAuth 2.0 (Khas untuk DELIMa 3.0 sahaja)
+      // Direct Google OAuth 2.0 Rasmi DELIMa 3.0
       const clientId = "950472034074-acj262jqk6trve8i4ndsudqeokvh5pef.apps.googleusercontent.com";
       const redirectUri = "https://d3.delima.edu.my/authentication/code";
       const scope = "openid email profile";
@@ -425,33 +425,31 @@ function getRedirectUrl(targetKey, email) {
         "&hd=moe-dl.edu.my";
 
     case 'classroom':
-      // Direct Service Login Google Classroom (Pintas terus ke akaun murid)
-      return "https://accounts.google.com/ServiceLogin?" +
-        "service=classroom" +
-        "&continue=" + encodeURIComponent("https://classroom.google.com") +
-        "&login_hint=" + encodedEmail;
+      // Tumpu pada Emel Murid Ini (Minta Kata Laluan Jika PC Berkongsi)
+      return "https://accounts.google.com/AccountChooser/identifier?" +
+        "continue=" + encodeURIComponent("https://classroom.google.com") +
+        "&Email=" + encodedEmail +
+        "&hl=ms";
 
     case 'gmail':
-      // Direct Service Login Gmail
-      return "https://accounts.google.com/ServiceLogin?" +
-        "service=mail" +
-        "&continue=" + encodeURIComponent("https://mail.google.com") +
-        "&login_hint=" + encodedEmail;
+      // Tumpu pada Gmail Murid Ini
+      return "https://accounts.google.com/AccountChooser/identifier?" +
+        "continue=" + encodeURIComponent("https://mail.google.com") +
+        "&Email=" + encodedEmail +
+        "&hl=ms";
 
     case 'canva':
-      // Canva guna AccountChooser untuk elak error 'Invalid State'
-      return "https://accounts.google.com/AccountChooser?" +
-        "login_hint=" + encodedEmail +
-        "&continue=" + encodeURIComponent("https://www.canva.com/login");
+      // Terus ke Laman Log Masuk Canva (Atasi Ralat 404 Google)
+      return "https://www.canva.com/login";
 
     case 'ains':
       return "https://ains.moe.gov.my";
 
     default:
-      return "https://accounts.google.com/AccountChooser?login_hint=" + encodedEmail;
+      return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail;
   }
 }
-
+    
     // -----------------------------------------------------------
     // LOGIK KLIK BUTANG APLIKASI
     // -----------------------------------------------------------
