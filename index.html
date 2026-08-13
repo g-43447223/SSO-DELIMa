@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="ms" class="dark">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub Akses Digital SKPI - Portal SSO</title>
+  
   <!-- PWA & Apple iOS Support -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1d4ed8">
@@ -8,10 +12,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SKPI SSO">
   <link rel="apple-touch-icon" href="icon-192.png">
-  
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hub Akses Digital SKPI - Portal SSO</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -33,16 +33,6 @@
         }
       }
     }
-    
-    // Daftar Service Worker untuk PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker Berjaya Didaftarkan:', reg.scope))
-        .catch(err => console.error('Pendaftaran Service Worker Gagal:', err));
-    });
-  }
-    
   </script>
   
   <style>
@@ -65,40 +55,6 @@
     }
   </style>
 </head>
-  <!-- BANNER INSTALL PWA (Android / Windows / macOS) -->
-  <div id="pwaInstallBanner" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto z-50 bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-md transition-all duration-300">
-    <div class="flex items-center gap-3">
-      <img src="icon-192.png" alt="SKPI SSO Logo" class="w-11 h-11 rounded-xl border border-blue-400/30 object-cover">
-      <div class="flex-1">
-        <h4 class="font-bold text-sm text-white">Pasang Aplikasi SKPI SSO</h4>
-        <p class="text-[11px] text-slate-300">Akses pantas terus dari Skrin Utama tanpa buka pelayar web.</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-2 mt-3">
-      <button id="btnInstallPWA" class="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-blue-500/30">
-        📲 Pasang Sekarang
-      </button>
-      <button onclick="dismissInstallBanner()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl">
-        Nanti
-      </button>
-    </div>
-  </div>
-
-  <!-- BANNER PANDUAN INSTALL KHAS IOS (iPhone / iPad) -->
-  <div id="iosInstallBanner" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto z-50 bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-md transition-all duration-300">
-    <div class="flex items-start gap-3">
-      <img src="icon-192.png" alt="SKPI SSO Logo" class="w-11 h-11 rounded-xl border border-blue-400/30 object-cover">
-      <div class="flex-1">
-        <h4 class="font-bold text-sm text-white">Pasang Aplikasi pada iPhone/iPad</h4>
-        <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
-          Tekan butang <strong class="text-blue-400">Share (Kongsi)</strong> 
-          <svg class="inline w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> 
-          pada Safari, kemudian pilih <strong class="text-blue-400 font-bold">'Add to Home Screen'</strong>.
-        </p>
-      </div>
-      <button onclick="dismissIOSBanner()" class="text-slate-400 hover:text-white p-1">✕</button>
-    </div>
-  </div>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300 flex flex-col justify-between relative overflow-x-hidden">
 
   <!-- Glow Backgrounds -->
@@ -228,7 +184,7 @@
           <div class="border border-white/20 rounded-xl p-4 backdrop-blur-md bg-white/5 space-y-3 text-xs leading-relaxed text-blue-50">
             <p>💡 Panduan Penggunaan:</p>
             <ol class="list-decimal list-inside space-y-1.5 opacity-90">
-              <li>Pilih **Tahun**, **Kelas**, dan **Nama Murid**.</li>
+              <li>Pilih <strong>Tahun</strong>, <strong>Kelas</strong>, dan <strong>Nama Murid</strong>.</li>
               <li>ID DELIMa akan dipaparkan secara automatik di dalam kotak.</li>
               <li>Klik mana-mana butang aplikasi sasaran yang diingini.</li>
             </ol>
@@ -253,6 +209,84 @@
     <p class="mt-1">Hub Akses Digital dibangunkan oleh <span class="font-semibold text-slate-700 dark:text-slate-300">Sir Fahmi Rahim</span></p>
   </footer>
 
+  <!-- MODAL REDIRECT OVERLAY (TEMA SKPI SSO) -->
+  <div id="redirectModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-card bg-slate-900/90 border border-blue-500/30 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative animate-in fade-in zoom-in duration-300">
+      
+      <!-- Ikon Semakan Berjaya ✅ -->
+      <div class="w-14 h-14 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-400"></i>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-0.5">Log Masuk Berjaya!</h3>
+      <p id="modalNama" class="text-xs font-semibold text-blue-400 uppercase tracking-wide mb-3 px-2">
+        NAMA MURID
+      </p>
+
+      <!-- Kotak ID DELIMa -->
+      <div class="bg-blue-950/50 border border-blue-500/30 rounded-xl py-2.5 px-3 mb-3">
+        <span class="block text-[10px] font-bold text-blue-300/80 uppercase tracking-wider mb-0.5">ID DELIMa (Disalin Automatik)</span>
+        <span id="modalEmail" class="font-mono text-xs sm:text-sm font-bold text-slate-100 break-all">
+          email@moe-dl.edu.my
+        </span>
+      </div>
+
+      <!-- Badge Aplikasi Sasaran -->
+      <div class="mb-4">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600/80 border border-blue-400/30 text-white font-bold text-[10px] rounded-full uppercase tracking-wider shadow-sm">
+          <i data-lucide="external-link" class="w-3 h-3"></i>
+          <span id="modalAppName">AINS</span>
+        </span>
+      </div>
+
+      <p class="text-[11px] text-slate-300 mb-4">
+        Mengalihkan ke portal dalam beberapa saat...
+      </p>
+
+      <!-- Indicator Sila Tunggu -->
+      <div class="w-full py-2.5 bg-slate-800/80 border border-slate-700 text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center gap-2">
+        <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-400"></i>
+        <span>Sila tunggu sebentar...</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BANNER INSTALL PWA (Android / Windows / macOS) -->
+  <div id="pwaInstallBanner" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto z-50 bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-md transition-all duration-300">
+    <div class="flex items-center gap-3">
+      <img src="icon-192.png" alt="SKPI SSO Logo" class="w-11 h-11 rounded-xl border border-blue-400/30 object-cover" onerror="this.src='LOGO-SEKOLAH.png'">
+      <div class="flex-1">
+        <h4 class="font-bold text-sm text-white">Pasang Aplikasi SKPI SSO</h4>
+        <p class="text-[11px] text-slate-300">Akses pantas terus dari Skrin Utama tanpa buka pelayar web.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 mt-3">
+      <button id="btnInstallPWA" class="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-blue-500/30">
+        📲 Pasang Sekarang
+      </button>
+      <button onclick="dismissInstallBanner()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl">
+        Nanti
+      </button>
+    </div>
+  </div>
+
+  <!-- BANNER PANDUAN INSTALL KHAS IOS (iPhone / iPad) -->
+  <div id="iosInstallBanner" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto z-50 bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-md transition-all duration-300">
+    <div class="flex items-start gap-3">
+      <img src="icon-192.png" alt="SKPI SSO Logo" class="w-11 h-11 rounded-xl border border-blue-400/30 object-cover" onerror="this.src='LOGO-SEKOLAH.png'">
+      <div class="flex-1">
+        <h4 class="font-bold text-sm text-white">Pasang Aplikasi pada iPhone/iPad</h4>
+        <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+          Tekan butang <strong class="text-blue-400">Share (Kongsi)</strong> 
+          <svg class="inline w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> 
+          pada Safari, kemudian pilih <strong class="text-blue-400 font-bold">'Add to Home Screen'</strong>.
+        </p>
+      </div>
+      <button onclick="dismissIOSBanner()" class="text-slate-400 hover:text-white p-1">✕</button>
+    </div>
+  </div>
+
   <script>
     lucide.createIcons();
     
@@ -260,14 +294,6 @@
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz8UCKh3OyzTbnQ0mirQGSK1QRk9LtLZ05ReWwD4HqYp_oeAFKlrQmV1zv60-8bLZ6KPg/exec";
     
     let dbData = {};
-
-    const APP_URLS = {
-      delima: "https://d3.delima.edu.my/landing",
-      classroom: "https://classroom.google.com",
-      ains: "https://ains.moe.gov.my",
-      gmail: "https://mail.google.com",
-      canva: "https://www.canva.com/login"
-    };
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -399,7 +425,36 @@
       document.querySelectorAll('.btn-target').forEach(btn => btn.disabled = true);
     }
 
-    // Pemprosesan Klik Butang Sasaran dengan Redirect Overlay (Tema SKPI)
+    // -----------------------------------------------------------
+    // LOGIK PENJANAAN URL LOG MASUK GOOGLE SERVICE (AUTO-FILL)
+    // -----------------------------------------------------------
+    function getRedirectUrl(targetKey, email) {
+      const encodedEmail = encodeURIComponent(email);
+      
+      switch (targetKey) {
+        case 'delima':
+          return "https://accounts.google.com/ServiceLogin?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://d3.delima.edu.my");
+
+        case 'classroom':
+          return "https://accounts.google.com/ServiceLogin?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://classroom.google.com");
+
+        case 'gmail':
+          return "https://accounts.google.com/ServiceLogin?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://mail.google.com");
+
+        case 'canva':
+          return "https://accounts.google.com/ServiceLogin?Email=" + encodedEmail + "&continue=" + encodeURIComponent("https://www.canva.com/login");
+
+        case 'ains':
+          return "https://ains.moe.gov.my";
+
+        default:
+          return "https://accounts.google.com/ServiceLogin?Email=" + encodedEmail;
+      }
+    }
+
+    // -----------------------------------------------------------
+    // KLIK BUTANG SASARAN + REDIRECT OVERLAY
+    // -----------------------------------------------------------
     document.querySelectorAll('.btn-target').forEach(btn => {
       btn.addEventListener('click', function() {
         let tahun = document.getElementById('tahun').value;
@@ -408,9 +463,8 @@
         let email = muridSelect.value;
         let nama = muridSelect.options[muridSelect.selectedIndex].textContent;
         let targetKey = this.getAttribute('data-target');
-        let targetUrl = APP_URLS[targetKey];
 
-        if (!email || !targetUrl) return;
+        if (!email) return;
 
         // 1. Rekod Log ke Google Sheets
         let logUrl = GAS_API_URL + "?action=log" +
@@ -428,126 +482,86 @@
           navigator.clipboard.writeText(email).catch(() => {});
         }
 
-        // 3. Kemaskini Maklumat Modal Ikut Tema SKPI
+        // 3. Kemaskini Maklumat Modal SKPI
         document.getElementById('modalNama').textContent = nama;
         document.getElementById('modalEmail').textContent = email;
         document.getElementById('modalAppName').textContent = targetKey.toUpperCase();
 
-        // 4. Papar Modal & Render Ikon Lucide
+        // 4. Papar Modal Redirect
         const redirectModal = document.getElementById('redirectModal');
         redirectModal.classList.remove('hidden');
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
-        // 5. Alihkan Laman (Redirect) Selepas 2 Saat
+        // 5. Alihkan Laman Selepas 1.5 Saat
         setTimeout(() => {
-          let redirectUrl = "https://accounts.google.com/AccountChooser?Email=" + encodeURIComponent(email) + "&continue=" + encodeURIComponent(targetUrl);
-          window.location.href = redirectUrl;
-        }, 2000);
+          window.location.href = getRedirectUrl(targetKey, email);
+        }, 1500);
       });
     });
 
     // -----------------------------------------------------------
-  // PWA INSTALL PROMPT LOGIC
-  // -----------------------------------------------------------
-  let deferredPrompt;
-  const pwaBanner = document.getElementById('pwaInstallBanner');
-  const iosBanner = document.getElementById('iosInstallBanner');
-  const btnInstall = document.getElementById('btnInstallPWA');
+    // LOGIK PWA INSTALL PROMPT & SERVICE WORKER
+    // -----------------------------------------------------------
+    let deferredPrompt;
+    const pwaBanner = document.getElementById('pwaInstallBanner');
+    const iosBanner = document.getElementById('iosInstallBanner');
+    const btnInstall = document.getElementById('btnInstallPWA');
 
-  // 1. Kesesan jika peranti adalah iOS (Safari)
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-  // Papar banner khas untuk iOS jika belum diinstall
-  if (isIOS && !isStandalone && !localStorage.getItem('dismissedIOSBanner')) {
-    if (iosBanner) iosBanner.classList.remove('hidden');
-  }
-
-  // 2. Tangkap event 'beforeinstallprompt' (Android, Chrome, Edge)
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); // Halang pop-up laluan browser yang kecil
-    deferredPrompt = e;  // Simpan acara promosi
-
-    // Jika pengguna belum pernah tekan "Nanti", paparkan banner promosi
-    if (!localStorage.getItem('dismissedPWABanner') && pwaBanner) {
-      pwaBanner.classList.remove('hidden');
+    // Daftar Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker Berjaya Didaftarkan:', reg.scope))
+          .catch(err => console.error('Pendaftaran Service Worker Gagal:', err));
+      });
     }
-  });
 
-  // 3. Apabila butang "Pasang Sekarang" ditekan
-  if (btnInstall) {
-    btnInstall.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt(); // Papar dialog installation asli browser
-        const { outcome } = await deferredPrompt.userChoice;
-        
-        if (outcome === 'accepted') {
-          console.log('Pengguna telah memasang PWA');
-        }
-        deferredPrompt = null;
-        if (pwaBanner) pwaBanner.classList.add('hidden');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    // Papar banner khas untuk iOS jika belum diinstall
+    if (isIOS && !isStandalone && !localStorage.getItem('dismissedIOSBanner')) {
+      if (iosBanner) iosBanner.classList.remove('hidden');
+    }
+
+    // Tangkap event 'beforeinstallprompt' (Android, Chrome, Edge)
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      if (!localStorage.getItem('dismissedPWABanner') && pwaBanner) {
+        pwaBanner.classList.remove('hidden');
       }
     });
-  }
 
-  function dismissInstallBanner() {
-    if (pwaBanner) pwaBanner.classList.add('hidden');
-    localStorage.setItem('dismissedPWABanner', 'true'); // Jangan ganggu lagi session ini
-  }
+    if (btnInstall) {
+      btnInstall.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            console.log('Pengguna telah memasang PWA');
+          }
+          deferredPrompt = null;
+          if (pwaBanner) pwaBanner.classList.add('hidden');
+        }
+      });
+    }
 
-  function dismissIOSBanner() {
-    if (iosBanner) iosBanner.classList.add('hidden');
-    localStorage.setItem('dismissedIOSBanner', 'true');
-  }
+    function dismissInstallBanner() {
+      if (pwaBanner) pwaBanner.classList.add('hidden');
+      localStorage.setItem('dismissedPWABanner', 'true');
+    }
 
-  // Hide banner automatik jika app dibuka secara Standalone (App Mode)
-  window.addEventListener('appinstalled', () => {
-    if (pwaBanner) pwaBanner.classList.add('hidden');
-    console.log('PWA berjaya dipasang');
-  });
+    function dismissIOSBanner() {
+      if (iosBanner) iosBanner.classList.add('hidden');
+      localStorage.setItem('dismissedIOSBanner', 'true');
+    }
+
+    window.addEventListener('appinstalled', () => {
+      if (pwaBanner) pwaBanner.classList.add('hidden');
+      console.log('PWA berjaya dipasang');
+    });
   </script>
-
-  <!-- MODAL REDIRECT OVERLAY (IKUT TEMA SKPI SSO) -->
-  <div id="redirectModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-card bg-slate-900/90 border border-blue-500/30 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative animate-in fade-in zoom-in duration-300">
-      
-      <!-- Ikon Semakan Berjaya ✅ -->
-      <div class="w-14 h-14 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center mx-auto mb-3">
-        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-400"></i>
-      </div>
-
-      <h3 class="text-lg font-bold text-white mb-0.5">Log Masuk Berjaya!</h3>
-      <p id="modalNama" class="text-xs font-semibold text-blue-400 uppercase tracking-wide mb-3 px-2">
-        NAMA MURID
-      </p>
-
-      <!-- Kotak ID DELIMa -->
-      <div class="bg-blue-950/50 border border-blue-500/30 rounded-xl py-2.5 px-3 mb-3">
-        <span class="block text-[10px] font-bold text-blue-300/80 uppercase tracking-wider mb-0.5">ID DELIMa (Disalin Automatik)</span>
-        <span id="modalEmail" class="font-mono text-xs sm:text-sm font-bold text-slate-100 break-all">
-          email@moe-dl.edu.my
-        </span>
-      </div>
-
-      <!-- Badge Aplikasi Sasaran -->
-      <div class="mb-4">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600/80 border border-blue-400/30 text-white font-bold text-[10px] rounded-full uppercase tracking-wider shadow-sm">
-          <i data-lucide="external-link" class="w-3 h-3"></i>
-          <span id="modalAppName">AINS</span>
-        </span>
-      </div>
-
-      <p class="text-[11px] text-slate-300 mb-4">
-        Mengalihkan ke portal dalam beberapa saat...
-      </p>
-
-      <!-- Indicator Sila Tunggu -->
-      <div class="w-full py-2.5 bg-slate-800/80 border border-slate-700 text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center gap-2">
-        <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-400"></i>
-        <span>Sila tunggu sebentar...</span>
-      </div>
-
-    </div>
-  </div>
 </body>
 </html>
