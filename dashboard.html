@@ -38,27 +38,57 @@
     </button>
   </header>
 
-  <!-- Filter Tarikh -->
+  <!-- Filter Tarikh & Lain-lain -->
   <section class="max-w-7xl mx-auto mb-6">
-    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-end gap-3">
-      <div class="flex flex-col gap-1 flex-1 sm:flex-none">
-        <label for="dateFrom" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Dari Tarikh</label>
-        <input type="date" id="dateFrom" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-3">
+      <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="dateFrom" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Dari Tarikh</label>
+          <input type="date" id="dateFrom" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="dateTo" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Hingga Tarikh</label>
+          <input type="date" id="dateTo" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="filterTahun" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Tahun</label>
+          <select id="filterTahun" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Semua Tahun</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="filterKelas" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Kelas</label>
+          <select id="filterKelas" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Semua Kelas</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="filterApp" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Aplikasi</label>
+          <select id="filterApp" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Semua Aplikasi</option>
+            <option value="DELIMA">DELIMA</option>
+            <option value="CLASSROOM">CLASSROOM</option>
+            <option value="AINS">AINS</option>
+            <option value="GMAIL">GMAIL</option>
+            <option value="CANVA">CANVA</option>
+          </select>
+        </div>
       </div>
-      <div class="flex flex-col gap-1 flex-1 sm:flex-none">
-        <label for="dateTo" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Hingga Tarikh</label>
-        <input type="date" id="dateTo" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
-      </div>
-      <div class="flex items-center gap-2 mt-2 sm:mt-0">
-        <button onclick="applyDateFilter()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-lg shadow-emerald-500/10">
-          <i data-lucide="filter" class="w-4 h-4"></i> Tapis
-        </button>
-        <button onclick="resetDateFilter()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold rounded-xl flex items-center gap-2 transition">
-          <i data-lucide="x" class="w-4 h-4"></i> Reset
-        </button>
-      </div>
-      <div class="sm:ml-auto text-[11px] text-slate-400 mt-1 sm:mt-0">
-        <span id="filterInfo" class="italic">Menunjukkan semua rekod</span>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button onclick="applyAllFilters()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-lg shadow-emerald-500/10">
+            <i data-lucide="filter" class="w-4 h-4"></i> Tapis
+          </button>
+          <button onclick="resetAllFilters()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold rounded-xl flex items-center gap-2 transition">
+            <i data-lucide="x" class="w-4 h-4"></i> Reset Semua
+          </button>
+          <button onclick="exportFilteredToCSV()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-lg shadow-blue-500/10">
+            <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+          </button>
+        </div>
+        <div class="text-[11px] text-slate-400">
+          <span id="filterInfo" class="italic">Menunjukkan semua rekod</span>
+        </div>
       </div>
     </div>
   </section>
@@ -165,8 +195,12 @@
     let yearChartInstance = null;
 
     let allLogs = [];
+    let currentFilteredLogs = [];
 
-    window.onload = fetchAnalyticsData;
+    window.onload = function() {
+      fetchAnalyticsData();
+      if (window.lucide) lucide.createIcons();
+    };
 
     function fetchAnalyticsData() {
       if (!GAS_API_URL || GAS_API_URL.includes("TAMPAL_WEB_APP_URL")) {
@@ -178,63 +212,148 @@
         .then(res => res.json())
         .then(data => {
           allLogs = data.logs || [];
-          processAnalytics(allLogs);
+          populateFilterDropdowns();
+          applyAllFilters();
         })
         .catch(err => {
           console.error("Gagal mengambil data:", err);
         });
     }
 
-    function applyDateFilter() {
+    function populateFilterDropdowns() {
+      const tahunSet = new Set();
+      const kelasSet = new Set();
+      allLogs.forEach(l => {
+        if (l.tahun) tahunSet.add(l.tahun);
+        if (l.kelas) kelasSet.add(l.kelas);
+      });
+
+      const filterTahun = document.getElementById('filterTahun');
+      const filterKelas = document.getElementById('filterKelas');
+      if (!filterTahun || !filterKelas) return;
+
+      // Clear existing except first
+      filterTahun.querySelectorAll('option:not(:first-child)').forEach(o => o.remove());
+      Array.from(tahunSet).sort().forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        filterTahun.appendChild(opt);
+      });
+
+      filterKelas.querySelectorAll('option:not(:first-child)').forEach(o => o.remove());
+      Array.from(kelasSet).sort().forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = k;
+        filterKelas.appendChild(opt);
+      });
+    }
+
+    function applyAllFilters() {
       const dateFromInput = document.getElementById('dateFrom').value;
       const dateToInput = document.getElementById('dateTo').value;
+      const filterTahun = document.getElementById('filterTahun').value;
+      const filterKelas = document.getElementById('filterKelas').value;
+      const filterApp = document.getElementById('filterApp').value;
       const filterInfo = document.getElementById('filterInfo');
 
-      if (!dateFromInput && !dateToInput) {
-        processAnalytics(allLogs);
-        filterInfo.textContent = "Menunjukkan semua rekod";
-        return;
-      }
-
       let filtered = allLogs.filter(l => {
-        if (!l.masa) return false;
-        const logDate = new Date(l.masa);
-        // Set to start of day for comparison
-        const logDateOnly = new Date(logDate.getFullYear(), logDate.getMonth(), logDate.getDate());
-
-        if (dateFromInput && dateToInput) {
-          const from = new Date(dateFromInput);
-          const to = new Date(dateToInput);
-          return logDateOnly >= from && logDateOnly <= to;
-        } else if (dateFromInput) {
-          const from = new Date(dateFromInput);
-          return logDateOnly >= from;
-        } else if (dateToInput) {
-          const to = new Date(dateToInput);
-          return logDateOnly <= to;
+        // Date filter
+        if (dateFromInput || dateToInput) {
+          if (!l.masa) return false;
+          const logDate = new Date(l.masa);
+          const logDateOnly = new Date(logDate.getFullYear(), logDate.getMonth(), logDate.getDate());
+          if (dateFromInput && dateToInput) {
+            const from = new Date(dateFromInput);
+            const to = new Date(dateToInput);
+            if (!(logDateOnly >= from && logDateOnly <= to)) return false;
+          } else if (dateFromInput) {
+            const from = new Date(dateFromInput);
+            if (logDateOnly < from) return false;
+          } else if (dateToInput) {
+            const to = new Date(dateToInput);
+            if (logDateOnly > to) return false;
+          }
         }
+
+        // Other filters
+        if (filterTahun && l.tahun !== filterTahun) return false;
+        if (filterKelas && l.kelas !== filterKelas) return false;
+        if (filterApp && (l.app || "").toUpperCase() !== filterApp) return false;
+
         return true;
       });
 
-      let infoText = "Tapis: ";
-      if (dateFromInput && dateToInput) {
-        infoText += `${dateFromInput} - ${dateToInput}`;
-      } else if (dateFromInput) {
-        infoText += `Dari ${dateFromInput}`;
-      } else if (dateToInput) {
-        infoText += `Hingga ${dateToInput}`;
+      currentFilteredLogs = filtered;
+
+      // Build info text
+      let infoParts = [];
+      if (dateFromInput && dateToInput) infoParts.push(`${dateFromInput} - ${dateToInput}`);
+      else if (dateFromInput) infoParts.push(`Dari ${dateFromInput}`);
+      else if (dateToInput) infoParts.push(`Hingga ${dateToInput}`);
+      if (filterTahun) infoParts.push(`Tahun: ${filterTahun}`);
+      if (filterKelas) infoParts.push(`Kelas: ${filterKelas}`);
+      if (filterApp) infoParts.push(`App: ${filterApp}`);
+      if (infoParts.length === 0) {
+        filterInfo.textContent = `Menunjukkan semua rekod (${filtered.length} rekod)`;
+      } else {
+        filterInfo.textContent = `Tapis: ${infoParts.join(' | ')} (${filtered.length} rekod)`;
       }
-      infoText += ` (${filtered.length} rekod)`;
-      filterInfo.textContent = infoText;
 
       processAnalytics(filtered);
     }
 
-    function resetDateFilter() {
+    function resetAllFilters() {
       document.getElementById('dateFrom').value = "";
       document.getElementById('dateTo').value = "";
+      document.getElementById('filterTahun').value = "";
+      document.getElementById('filterKelas').value = "";
+      document.getElementById('filterApp').value = "";
       document.getElementById('filterInfo').textContent = "Menunjukkan semua rekod";
-      processAnalytics(allLogs);
+      applyAllFilters();
+    }
+
+    function exportFilteredToCSV() {
+      const logs = currentFilteredLogs.length > 0 ? currentFilteredLogs : allLogs;
+      if (!logs || logs.length === 0) {
+        alert("Tiada data untuk dieksport.");
+        return;
+      }
+
+      const headers = ['Masa', 'Nama Murid', 'Tahun', 'Kelas', 'Email', 'Aplikasi', 'Platform'];
+      let csv = headers.join(',') + '\r\n';
+
+      logs.forEach(l => {
+        const dateObj = new Date(l.masa);
+        const masa = isNaN(dateObj.getTime()) ? (l.masa || '') : dateObj.toLocaleString('ms-MY');
+        const nama = (l.nama || '').replace(/"/g, '""');
+        const tahun = l.tahun || '';
+        const kelas = l.kelas || '';
+        const email = l.email || '';
+        const app = (l.app || '').toUpperCase();
+        const source = l.source || 'Web';
+        csv += `"${masa}","${nama}","${tahun}","${kelas}","${email}","${app}","${source}"\r\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const dateStr = new Date().toISOString().slice(0,10);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Laporan_SSO_DELIMa_${dateStr}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function applyDateFilter() {
+      applyAllFilters();
+    }
+
+    function resetDateFilter() {
+      resetAllFilters();
     }
 
     function processAnalytics(logs) {

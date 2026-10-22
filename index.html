@@ -150,6 +150,12 @@
               </a>
 
             </div>
+
+            <!-- Butang Murid Seterusnya -->
+            <button onclick="resetForNextStudent()" class="mt-2.5 w-full py-2 bg-slate-700 hover:bg-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-100 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+              <i data-lucide="user-round-plus" class="w-3.5 h-3.5"></i>
+              <span>MURID SETERUSNYA</span>
+            </button>
           </div>
 
           <!-- Pilihan Aplikasi Destinasi -->
@@ -297,6 +303,9 @@
         redirectModal.classList.add('hidden');
       }
 
+      // Pastikan UI tidak terkunci semasa redirect
+      enableFormInteractivity();
+
       // Reset paparan ID DELIMa
       const emailDisplay = document.getElementById('emailDisplay');
       if (emailDisplay) {
@@ -310,7 +319,10 @@
       }
 
       // Disable kesemua butang aplikasi
-      document.querySelectorAll('.btn-target').forEach(btn => btn.disabled = true);
+      document.querySelectorAll('.btn-target').forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('pointer-events-none', 'opacity-60');
+      });
 
       // Reset dropdown murid
       const muridSelect = document.getElementById('murid');
@@ -340,6 +352,52 @@
           kelasSelect.disabled = true;
         }
       }
+    }
+
+    function resetForNextStudent() {
+      // Reset sepenuhnya untuk murid seterusnya, kekalkan tahun & kelas dipilih
+      const redirectModal = document.getElementById('redirectModal');
+      if (redirectModal) {
+        redirectModal.classList.add('hidden');
+      }
+
+      enableFormInteractivity();
+
+      const emailDisplay = document.getElementById('emailDisplay');
+      if (emailDisplay) {
+        emailDisplay.textContent = "-- Belum Dipilih --";
+      }
+
+      const btnResetPass = document.getElementById('btnResetPass');
+      if (btnResetPass) {
+        btnResetPass.href = "https://t.me/Sistem_ID_DELIMa_SKPI_bot";
+      }
+
+      document.querySelectorAll('.btn-target').forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove('pointer-events-none', 'opacity-60');
+      });
+
+      const muridSelect = document.getElementById('murid');
+      if (muridSelect) {
+        muridSelect.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
+        const tahun = document.getElementById('tahun').value;
+        const kelas = document.getElementById('kelas').value;
+        if (tahun && kelas && dbData && dbData[tahun] && dbData[tahun][kelas]) {
+          muridSelect.disabled = false;
+          dbData[tahun][kelas].forEach(function(student) {
+            let opt = document.createElement('option');
+            opt.value = student.email;
+            opt.innerHTML = student.nama;
+            muridSelect.appendChild(opt);
+          });
+        } else {
+          muridSelect.disabled = true;
+        }
+        muridSelect.value = "";
+      }
+
+      if (window.lucide) lucide.createIcons();
     }
     
     window.addEventListener('pageshow', function(event) {
@@ -547,16 +605,50 @@
     // -----------------------------------------------------------
     // LOGIK KLIK BUTANG APLIKASI
     // -----------------------------------------------------------
+    function disableFormInteractivity() {
+      const tahunSelect = document.getElementById('tahun');
+      const kelasSelect = document.getElementById('kelas');
+      const muridSelect = document.getElementById('murid');
+      if (tahunSelect) tahunSelect.disabled = true;
+      if (kelasSelect) kelasSelect.disabled = true;
+      if (muridSelect) muridSelect.disabled = true;
+      document.querySelectorAll('.btn-target').forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('pointer-events-none', 'opacity-60');
+      });
+    }
+
+    function enableFormInteractivity() {
+      const tahunSelect = document.getElementById('tahun');
+      const kelasSelect = document.getElementById('kelas');
+      const muridSelect = document.getElementById('murid');
+      if (tahunSelect) tahunSelect.disabled = false;
+      if (kelasSelect && kelasSelect.options.length > 1) kelasSelect.disabled = false;
+      if (muridSelect && muridSelect.value) {
+        // keep current state logic via other handlers; just ensure not locked
+      }
+      document.querySelectorAll('.btn-target').forEach(btn => {
+        btn.classList.remove('pointer-events-none', 'opacity-60');
+      });
+    }
+
     document.querySelectorAll('.btn-target').forEach(btn => {
       btn.addEventListener('click', function() {
         let tahun = document.getElementById('tahun').value;
         let kelas = document.getElementById('kelas').value;
         let muridSelect = document.getElementById('murid');
         let email = muridSelect.value;
-        let nama = muridSelect.options[muridSelect.selectedIndex].textContent;
+        let nama = muridSelect.options[muridSelect.selectedIndex] ? muridSelect.options[muridSelect.selectedIndex].textContent : '';
         let targetKey = this.getAttribute('data-target');
 
-        if (!email) return;
+        if (!email || this.disabled) return;
+
+        // Halang double-click - disable semua butang aplikasi
+        document.querySelectorAll('.btn-target').forEach(b => {
+          b.disabled = true;
+          b.classList.add('pointer-events-none', 'opacity-60');
+        });
+        disableFormInteractivity();
 
         // 1. Rekod Log ke Google Sheets
         let logUrl = GAS_API_URL + "?action=log" +
