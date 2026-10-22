@@ -122,10 +122,10 @@
             </div>
 
             <div>
-              <label for="murid" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">3. Pilih Nama Murid:</label>
-              <select id="murid" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
-                <option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>
-              </select>
+              <label for="murid" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-spte-300 mb-1">3. Pilih Nama Murid:</label>
+              <input type="text" id="muridSearch" list="muridList" disabled placeholder="-- Taip atau pilih nama murid --" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" autocomplete="off">
+              <datalist id="muridList"></datalist>
+              <input type="hidden" id="muridEmail">
             </div>
           </div>
 
@@ -324,7 +324,17 @@
         btn.classList.remove('pointer-events-none', 'opacity-60');
       });
 
-      // Reset dropdown murid
+      // Reset dropdown murid / carian murid
+      const muridSearch = document.getElementById('muridSearch');
+      const muridEmail = document.getElementById('muridEmail');
+      const muridList = document.getElementById('muridList');
+      if (muridSearch) {
+        muridSearch.value = '';
+        muridSearch.disabled = true;
+      }
+      if (muridEmail) muridEmail.value = '';
+      if (muridList) muridList.innerHTML = '';
+      muridListData = [];
       const muridSelect = document.getElementById('murid');
       if (muridSelect) {
         muridSelect.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
@@ -346,6 +356,16 @@
             kelasSelect.appendChild(opt);
           }
           kelasSelect.disabled = false;
+          // Cuba auto-pilih kelas terakhir
+          const last = loadLastSelection();
+          if (last.kelas && dbData[tahunSelect.value][last.kelas]) {
+            kelasSelect.value = last.kelas;
+            updateStudentDropdown();
+            setTimeout(() => {
+              const ms = document.getElementById('muridSearch');
+              if (ms && !ms.disabled) ms.focus();
+            }, 150);
+          }
         } else {
           kelasSelect.innerHTML = '<option value="">-- Sila Pilih Tahun Terlebih Dahulu --</option>';
           kelasSelect.value = "";
@@ -378,23 +398,41 @@
         btn.classList.remove('pointer-events-none', 'opacity-60');
       });
 
-      const muridSelect = document.getElementById('murid');
-      if (muridSelect) {
-        muridSelect.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
+      const muridSearch = document.getElementById('muridSearch');
+      const muridEmail = document.getElementById('muridEmail');
+      const muridList = document.getElementById('muridList');
+      if (muridSearch) {
+        muridSearch.value = '';
         const tahun = document.getElementById('tahun').value;
         const kelas = document.getElementById('kelas').value;
         if (tahun && kelas && dbData && dbData[tahun] && dbData[tahun][kelas]) {
-          muridSelect.disabled = false;
-          dbData[tahun][kelas].forEach(function(student) {
-            let opt = document.createElement('option');
-            opt.value = student.email;
-            opt.innerHTML = student.nama;
-            muridSelect.appendChild(opt);
-          });
+          muridSearch.disabled = false;
+          if (muridList) {
+            muridList.innerHTML = '';
+            muridListData = dbData[tahun][kelas];
+            muridListData.forEach(function(student) {
+              let opt = document.createElement('option');
+              opt.value = student.nama;
+              opt.setAttribute('data-email', student.email);
+              muridList.appendChild(opt);
+            });
+          } else {
+            muridListData = dbData[tahun][kelas];
+          }
+          setTimeout(() => {
+            if (muridSearch && !muridSearch.disabled) muridSearch.focus();
+          }, 50);
         } else {
-          muridSelect.disabled = true;
+          muridSearch.disabled = true;
         }
+      }
+      if (muridEmail) muridEmail.value = '';
+
+      const muridSelect = document.getElementById('murid');
+      if (muridSelect) {
+        muridSelect.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
         muridSelect.value = "";
+        muridSelect.disabled = true;
       }
 
       if (window.lucide) lucide.createIcons();
@@ -471,6 +509,13 @@
             opt.innerHTML = tahun;
             tahunSelect.appendChild(opt);
           });
+
+          // Auto-pilih tahun terakhir
+          const last = loadLastSelection();
+          if (last.tahun && dbData[last.tahun]) {
+            tahunSelect.value = last.tahun;
+            updateKelasDropdown();
+          }
         })
         .catch(err => {
           console.error("Gagal memuatkan API:", err);
@@ -478,14 +523,45 @@
         });
     };
 
+    function saveLastSelection() {
+      try {
+        const tahun = document.getElementById('tahun').value;
+        const kelas = document.getElementById('kelas').value;
+        if (tahun) localStorage.setItem('sso_last_tahun', tahun);
+        if (kelas) localStorage.setItem('sso_last_kelas', kelas);
+      } catch(e) {}
+    }
+
+    function loadLastSelection() {
+      try {
+        return {
+          tahun: localStorage.getItem('sso_last_tahun') || '',
+          kelas: localStorage.getItem('sso_last_kelas') || ''
+        };
+      } catch(e) {
+        return { tahun: '', kelas: '' };
+      }
+    }
+
+    let muridListData = [];
+
     function updateKelasDropdown() {
       let tahun = document.getElementById('tahun').value;
       let kelasSelect = document.getElementById('kelas');
-      let muridSelect = document.getElementById('murid');
+      let muridSearch = document.getElementById('muridSearch');
+      let muridList = document.getElementById('muridList');
+      let muridEmail = document.getElementById('muridEmail');
+
+      saveLastSelection();
 
       kelasSelect.innerHTML = '<option value="">-- Sila Pilih Kelas --</option>';
-      muridSelect.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
-      muridSelect.disabled = true;
+      if (muridSearch) {
+        muridSearch.value = '';
+        muridSearch.disabled = true;
+      }
+      if (muridList) muridList.innerHTML = '';
+      if (muridEmail) muridEmail.value = '';
+      muridListData = [];
       resetStudentSelection();
 
       if (tahun && dbData[tahun]) {
@@ -496,6 +572,17 @@
           opt.innerHTML = kelas;
           kelasSelect.appendChild(opt);
         }
+        // Auto-pilih kelas terakhir jika sama
+        const last = loadLastSelection();
+        if (last.kelas && dbData[tahun][last.kelas]) {
+          kelasSelect.value = last.kelas;
+          updateStudentDropdown();
+          // Auto-focus ke carian nama murid
+          setTimeout(() => {
+            const ms = document.getElementById('muridSearch');
+            if (ms && !ms.disabled) ms.focus();
+          }, 150);
+        }
       } else {
         kelasSelect.disabled = true;
       }
@@ -504,43 +591,116 @@
     function updateStudentDropdown() {
       let tahun = document.getElementById('tahun').value;
       let kelas = document.getElementById('kelas').value;
-      let muridSelect = document.getElementById('murid');
+      let muridSearch = document.getElementById('muridSearch');
+      let muridList = document.getElementById('muridList');
+      let muridEmail = document.getElementById('muridEmail');
       
-      muridSelect.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
+      saveLastSelection();
+      
+      if (muridSearch) {
+        muridSearch.value = '';
+        muridSearch.disabled = true;
+      }
+      if (muridList) muridList.innerHTML = '';
+      if (muridEmail) muridEmail.value = '';
+      muridListData = [];
       resetStudentSelection();
       
       if (tahun && kelas && dbData[tahun] && dbData[tahun][kelas]) {
-        muridSelect.disabled = false;
-        dbData[tahun][kelas].forEach(function(student) {
-          let opt = document.createElement('option');
-          opt.value = student.email;
-          opt.innerHTML = student.nama;
-          muridSelect.appendChild(opt);
+        if (muridSearch) muridSearch.disabled = false;
+        muridListData = dbData[tahun][kelas];
+        muridListData.forEach(function(student) {
+          if (muridList) {
+            let opt = document.createElement('option');
+            opt.value = student.nama;
+            opt.setAttribute('data-email', student.email);
+            muridList.appendChild(opt);
+          }
         });
+        // Auto-focus ke carian nama murid
+        setTimeout(() => {
+          if (muridSearch && !muridSearch.disabled) muridSearch.focus();
+        }, 100);
       } else {
-        muridSelect.disabled = true;
+        if (muridSearch) muridSearch.disabled = true;
       }
     }
 
-    // LISTENER PILIH MURID + SUNTIK ID PENUH KE BOT TELEGRAM
-    document.getElementById('murid').addEventListener('change', function() {
-      let email = this.value;
-      let emailDisplay = document.getElementById('emailDisplay');
-      let targetButtons = document.querySelectorAll('.btn-target');
-      let btnResetPass = document.getElementById('btnResetPass');
+    function handleMuridSearch() {
+      const muridSearch = document.getElementById('muridSearch');
+      const muridList = document.getElementById('muridList');
+      const muridEmail = document.getElementById('muridEmail');
+      const emailDisplay = document.getElementById('emailDisplay');
+      const targetButtons = document.querySelectorAll('.btn-target');
+      const btnResetPass = document.getElementById('btnResetPass');
 
-      if (email) {
-        emailDisplay.textContent = email;
+      if (!muridSearch) return;
+      const val = muridSearch.value.trim().toLowerCase();
+      
+      if (!val) {
+        if (muridEmail) muridEmail.value = '';
+        resetStudentSelection();
+        return;
+      }
+
+      // Cari padanan dalam muridListData
+      let found = null;
+      for (let i = 0; i < muridListData.length; i++) {
+        if (muridListData[i].nama.toLowerCase() === val) {
+          found = muridListData[i];
+          break;
+        }
+      }
+      if (!found) {
+        // Cuba padanan separa
+        for (let i = 0; i < muridListData.length; i++) {
+          if (muridListData[i].nama.toLowerCase().includes(val)) {
+            found = muridListData[i];
+            break;
+          }
+        }
+      }
+
+      if (found) {
+        if (muridEmail) muridEmail.value = found.email;
+        if (emailDisplay) emailDisplay.textContent = found.email;
         targetButtons.forEach(btn => btn.disabled = false);
-
-        // Hantar e-mel PENUH (bersama @moe-dl.edu.my) ke Bot Telegram Reset Password
         if (btnResetPass) {
-          btnResetPass.href = `https://t.me/Sistem_ID_DELIMa_SKPI_bot?start=${encodeURIComponent(email)}`;
+          btnResetPass.href = `https://t.me/Sistem_ID_DELIMa_SKPI_bot?start=${encodeURIComponent(found.email)}`;
         }
       } else {
+        if (muridEmail) muridEmail.value = '';
         resetStudentSelection();
       }
-    });
+    }
+
+    if (document.getElementById('muridSearch')) {
+      document.getElementById('muridSearch').addEventListener('input', handleMuridSearch);
+      document.getElementById('muridSearch').addEventListener('change', handleMuridSearch);
+    }
+
+    // LISTENER PILIH MURID + SUNTIK ID PENUH KE BOT TELEGRAM
+    const muridOld = document.getElementById('murid');
+    if (muridOld) {
+      muridOld.addEventListener('change', function() {
+        let email = this.value;
+        let emailDisplay = document.getElementById('emailDisplay');
+        let targetButtons = document.querySelectorAll('.btn-target');
+        let btnResetPass = document.getElementById('btnResetPass');
+
+        if (email) {
+          emailDisplay.textContent = email;
+          targetButtons.forEach(btn => btn.disabled = false);
+
+          // Hantar e-mel PENUH (bersama @moe-dl.edu.my) ke Bot Telegram Reset Password
+          if (btnResetPass) {
+            btnResetPass.href = `https://t.me/Sistem_ID_DELIMa_SKPI_bot?start=${encodeURIComponent(email)}`;
+          }
+        } else {
+          resetStudentSelection();
+        }
+      });
+    }
 
     function resetStudentSelection() {
       document.getElementById('emailDisplay').textContent = "-- Belum Dipilih --";
@@ -550,6 +710,8 @@
       if (btnResetPass) {
         btnResetPass.href = "https://t.me/Sistem_ID_DELIMa_SKPI_bot";
       }
+      const muridEmail = document.getElementById('muridEmail');
+      if (muridEmail) muridEmail.value = '';
     }
 
     // -----------------------------------------------------------
@@ -610,9 +772,11 @@
     function disableFormInteractivity() {
       const tahunSelect = document.getElementById('tahun');
       const kelasSelect = document.getElementById('kelas');
+      const muridSearch = document.getElementById('muridSearch');
       const muridSelect = document.getElementById('murid');
       if (tahunSelect) tahunSelect.disabled = true;
       if (kelasSelect) kelasSelect.disabled = true;
+      if (muridSearch) muridSearch.disabled = true;
       if (muridSelect) muridSelect.disabled = true;
       document.querySelectorAll('.btn-target').forEach(btn => {
         btn.disabled = true;
@@ -623,11 +787,12 @@
     function enableFormInteractivity() {
       const tahunSelect = document.getElementById('tahun');
       const kelasSelect = document.getElementById('kelas');
-      const muridSelect = document.getElementById('murid');
+      const muridSearch = document.getElementById('muridSearch');
+      const muridEmail = document.getElementById('muridEmail');
       if (tahunSelect) tahunSelect.disabled = false;
       if (kelasSelect && kelasSelect.options.length > 1) kelasSelect.disabled = false;
-      if (muridSelect && muridSelect.value) {
-        // keep current state logic via other handlers; just ensure not locked
+      if (muridSearch && muridEmail && muridEmail.value) {
+        // enable if email selected
       }
       document.querySelectorAll('.btn-target').forEach(btn => {
         btn.classList.remove('pointer-events-none', 'opacity-60');
@@ -636,14 +801,15 @@
 
     document.querySelectorAll('.btn-target').forEach(btn => {
       btn.addEventListener('click', function() {
-        let tahun = document.getElementById('tahun').value;
-        let kelas = document.getElementById('kelas').value;
-        let muridSelect = document.getElementById('murid');
-        let email = muridSelect.value;
-        let nama = muridSelect.options[muridSelect.selectedIndex] ? muridSelect.options[muridSelect.selectedIndex].textContent : '';
-        let targetKey = this.getAttribute('data-target');
+      let tahun = document.getElementById('tahun').value;
+      let kelas = document.getElementById('kelas').value;
+      let muridSearchEl = document.getElementById('muridSearch');
+      let muridEmailEl = document.getElementById('muridEmail');
+      let email = muridEmailEl ? muridEmailEl.value : (document.getElementById('murid') ? document.getElementById('murid').value : '');
+      let nama = muridSearchEl ? muridSearchEl.value : (document.getElementById('murid') && document.getElementById('murid').selectedOptions[0] ? document.getElementById('murid').selectedOptions[0].textContent : '');
+      let targetKey = this.getAttribute('data-target');
 
-        if (!email || this.disabled) return;
+      if (!email || this.disabled) return;
 
         // Halang double-click - disable semua butang aplikasi
         document.querySelectorAll('.btn-target').forEach(b => {

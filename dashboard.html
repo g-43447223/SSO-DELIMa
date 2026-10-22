@@ -41,6 +41,17 @@
   <!-- Filter Tarikh & Lain-lain -->
   <section class="max-w-7xl mx-auto mb-6">
     <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col gap-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="setQuickFilter('today')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Hari Ini
+        </button>
+        <button onclick="setQuickFilter('week')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="calendar-range" class="w-3.5 h-3.5"></i> Minggu Ini
+        </button>
+        <button onclick="setQuickFilter('month')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Bulan Ini
+        </button>
+      </div>
       <div class="flex flex-col sm:flex-row sm:items-end gap-3">
         <div class="flex flex-col gap-1 flex-1 sm:flex-none">
           <label for="dateFrom" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Dari Tarikh</label>
@@ -155,6 +166,16 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- Chart: Penglibatan Mengikut Jam -->
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+      <h3 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
+        <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i> Penglibatan Mengikut Jam (Waktu Guna)
+      </h3>
+      <div class="relative h-64">
+        <canvas id="hourChart"></canvas>
+      </div>
     </div>
 
     <!-- Log Aktiviti Terkini Table -->
@@ -304,6 +325,41 @@
       processAnalytics(filtered);
     }
 
+    function formatDateForInput(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    function setQuickFilter(type) {
+      const dateFrom = document.getElementById('dateFrom');
+      const dateTo = document.getElementById('dateTo');
+      if (!dateFrom || !dateTo) return;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      if (type === 'today') {
+        dateFrom.value = formatDateForInput(today);
+        dateTo.value = formatDateForInput(today);
+      } else if (type === 'week') {
+        // Mula Isnin
+        const day = today.getDay(); // 0 Ahad, 1 Isnin
+        const diff = (day === 0) ? -6 : 1 - day;
+        const monday = new Date(today);
+        monday.setDate(today.getDate() + diff);
+        dateFrom.value = formatDateForInput(monday);
+        dateTo.value = formatDateForInput(today);
+      } else if (type === 'month') {
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        dateFrom.value = formatDateForInput(firstDay);
+        dateTo.value = formatDateForInput(today);
+      }
+
+      applyAllFilters();
+    }
+
     function resetAllFilters() {
       document.getElementById('dateFrom').value = "";
       document.getElementById('dateTo').value = "";
@@ -366,8 +422,13 @@
       // Aggregations
       const appCounts = {};
       const yearCounts = {};
+      const hourCounts = {};
       let webCount = 0;
       let extCount = 0;
+
+      for (let h = 0; h < 24; h++) {
+        hourCounts[h] = 0;
+      }
 
       logs.forEach(l => {
         // App Counts
@@ -383,6 +444,15 @@
         // Source Counts
         if (l.source === "Extension") extCount++;
         else webCount++;
+
+        // Hour Counts
+        if (l.masa) {
+          const d = new Date(l.masa);
+          if (!isNaN(d.getTime())) {
+            const hour = d.getHours();
+            hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+          }
+        }
       });
 
       // Top App
@@ -400,6 +470,7 @@
       // Render Charts
       renderAppChart(appCounts);
       renderYearChart(yearCounts);
+      renderHourChart(hourCounts);
 
       // Render Table (Tunjuk 15 log terkini)
       renderLogTable([...logs].reverse().slice(0, 15));
@@ -429,6 +500,8 @@
       });
     }
 
+    let hourChartInstance = null;
+
     function renderYearChart(yearData) {
       const ctx = document.getElementById('yearChart').getContext('2d');
       if (yearChartInstance) yearChartInstance.destroy();
@@ -449,6 +522,42 @@
           maintainAspectRatio: false,
           scales: {
             x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderHourChart(hourData) {
+      const canvas = document.getElementById('hourChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (hourChartInstance) hourChartInstance.destroy();
+
+      const labels = [];
+      const dataArr = [];
+      for (let h = 0; h < 24; h++) {
+        labels.push(h.toString().padStart(2,'0') + ':00');
+        dataArr.push(hourData[h] || 0);
+      }
+
+      hourChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jumlah Akses',
+            data: dataArr,
+            backgroundColor: '#f59e0b',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#94a3b8', maxTicksLimit: 12 }, grid: { display: false } },
             y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
           },
           plugins: { legend: { display: false } }
