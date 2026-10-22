@@ -25,7 +25,7 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans p-4 sm:p-8">
 
   <!-- Header -->
-  <header class="max-w-7xl mx-auto mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-800">
+  <header class="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-800">
     <div>
       <h1 class="text-2xl font-bold text-blue-400 flex items-center gap-2">
         <i data-lucide="layout-dashboard"></i> DASHBOARD ANALISIS PENGGUNAAN
@@ -37,6 +37,31 @@
       <i data-lucide="refresh-cw" class="w-4 h-4"></i> Muat Semula Data
     </button>
   </header>
+
+  <!-- Filter Tarikh -->
+  <section class="max-w-7xl mx-auto mb-6">
+    <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-end gap-3">
+      <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+        <label for="dateFrom" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Dari Tarikh</label>
+        <input type="date" id="dateFrom" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+        <label for="dateTo" class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Hingga Tarikh</label>
+        <input type="date" id="dateTo" class="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div class="flex items-center gap-2 mt-2 sm:mt-0">
+        <button onclick="applyDateFilter()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-lg shadow-emerald-500/10">
+          <i data-lucide="filter" class="w-4 h-4"></i> Tapis
+        </button>
+        <button onclick="resetDateFilter()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold rounded-xl flex items-center gap-2 transition">
+          <i data-lucide="x" class="w-4 h-4"></i> Reset
+        </button>
+      </div>
+      <div class="sm:ml-auto text-[11px] text-slate-400 mt-1 sm:mt-0">
+        <span id="filterInfo" class="italic">Menunjukkan semua rekod</span>
+      </div>
+    </div>
+  </section>
 
   <main class="max-w-7xl mx-auto space-y-6">
 
@@ -139,6 +164,8 @@
     let appChartInstance = null;
     let yearChartInstance = null;
 
+    let allLogs = [];
+
     window.onload = fetchAnalyticsData;
 
     function fetchAnalyticsData() {
@@ -150,11 +177,64 @@
       fetch(GAS_API_URL + "?action=analytics")
         .then(res => res.json())
         .then(data => {
-          processAnalytics(data.logs || []);
+          allLogs = data.logs || [];
+          processAnalytics(allLogs);
         })
         .catch(err => {
           console.error("Gagal mengambil data:", err);
         });
+    }
+
+    function applyDateFilter() {
+      const dateFromInput = document.getElementById('dateFrom').value;
+      const dateToInput = document.getElementById('dateTo').value;
+      const filterInfo = document.getElementById('filterInfo');
+
+      if (!dateFromInput && !dateToInput) {
+        processAnalytics(allLogs);
+        filterInfo.textContent = "Menunjukkan semua rekod";
+        return;
+      }
+
+      let filtered = allLogs.filter(l => {
+        if (!l.masa) return false;
+        const logDate = new Date(l.masa);
+        // Set to start of day for comparison
+        const logDateOnly = new Date(logDate.getFullYear(), logDate.getMonth(), logDate.getDate());
+
+        if (dateFromInput && dateToInput) {
+          const from = new Date(dateFromInput);
+          const to = new Date(dateToInput);
+          return logDateOnly >= from && logDateOnly <= to;
+        } else if (dateFromInput) {
+          const from = new Date(dateFromInput);
+          return logDateOnly >= from;
+        } else if (dateToInput) {
+          const to = new Date(dateToInput);
+          return logDateOnly <= to;
+        }
+        return true;
+      });
+
+      let infoText = "Tapis: ";
+      if (dateFromInput && dateToInput) {
+        infoText += `${dateFromInput} - ${dateToInput}`;
+      } else if (dateFromInput) {
+        infoText += `Dari ${dateFromInput}`;
+      } else if (dateToInput) {
+        infoText += `Hingga ${dateToInput}`;
+      }
+      infoText += ` (${filtered.length} rekod)`;
+      filterInfo.textContent = infoText;
+
+      processAnalytics(filtered);
+    }
+
+    function resetDateFilter() {
+      document.getElementById('dateFrom').value = "";
+      document.getElementById('dateTo').value = "";
+      document.getElementById('filterInfo').textContent = "Menunjukkan semua rekod";
+      processAnalytics(allLogs);
     }
 
     function processAnalytics(logs) {
@@ -172,8 +252,10 @@
 
       logs.forEach(l => {
         // App Counts
-        let appName = l.app.toUpperCase();
-        appCounts[appName] = (appCounts[appName] || 0) + 1;
+        let appName = (l.app || "").toUpperCase();
+        if (appName) {
+          appCounts[appName] = (appCounts[appName] || 0) + 1;
+        }
 
         // Year Counts
         let yearName = l.tahun || "Lain-lain";
@@ -201,7 +283,7 @@
       renderYearChart(yearCounts);
 
       // Render Table (Tunjuk 15 log terkini)
-      renderLogTable(logs.reverse().slice(0, 15));
+      renderLogTable([...logs].reverse().slice(0, 15));
     }
 
     function renderAppChart(appData) {
@@ -257,25 +339,29 @@
 
     function renderLogTable(logs) {
       const tbody = document.getElementById('logTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       if (logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Tiada log rekod lagi.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Tiada log rekod untuk julat tarikh dipilih.</td></tr>';
         return;
       }
 
       logs.forEach(l => {
         let dateObj = new Date(l.masa);
+        if (isNaN(dateObj.getTime())) {
+          dateObj = new Date();
+        }
         let timeStr = dateObj.toLocaleDateString('ms-MY') + ' ' + dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
 
         let tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/30 transition";
         tr.innerHTML = `
           <td class="p-3 text-slate-400">${timeStr}</td>
-          <td class="p-3 font-semibold text-white">${l.nama}</td>
-          <td class="p-3">${l.tahun} - ${l.kelas}</td>
-          <td class="p-3 font-bold text-blue-400 uppercase">${l.app}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${l.source === 'Extension' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'}">${l.source}</span></td>
+          <td class="p-3 font-semibold text-white">${l.nama || '-'}</td>
+          <td class="p-3">${l.tahun || '-'} - ${l.kelas || '-'}</td>
+          <td class="p-3 font-bold text-blue-400 uppercase">${l.app || '-'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${l.source === 'Extension' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'}">${l.source || 'Web'}</span></td>
         `;
         tbody.appendChild(tr);
       });
