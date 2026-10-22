@@ -591,21 +591,13 @@
             "&hl=ms";
 
         case 'canva':
-          // Hantar terus ke Google SSO Canva dengan emel murid dipilih
-          return "https://accounts.google.com/AccountChooser/identifier?" +
-            "continue=" + encodeURIComponent("https://www.canva.com/login/google") +
-            "&Email=" + encodedEmail +
-            "&prompt=select_account" +
-            "&hl=ms";
+          // Kembali ke cara asal - buka terus login Canva
+          // Emel dah disalin automatik, murid pilih akaun Google terus
+          return "https://www.canva.com/ms/login";
 
         case 'ains':
-          // AINS kebiasaannya guna SSO/MOE. Cuba terus ke AINS dengan emel dipaparkan
-          // Guna AccountChooser supaya murid terus pilih akaun moe-dl.edu.my
-          return "https://accounts.google.com/AccountChooser/identifier?" +
-            "continue=" + encodeURIComponent("https://ains.moe.gov.my/") +
-            "&Email=" + encodedEmail +
-            "&prompt=select_account" +
-            "&hl=ms";
+          // Buka terus AINS
+          return "https://ains.moe.gov.my/";
 
         default:
           return "https://accounts.google.com/AccountChooser/identifier?Email=" + encodedEmail + "&prompt=select_account";
