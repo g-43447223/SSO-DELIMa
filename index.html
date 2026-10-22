@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ms" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub Akses Digital SKPI - Portal SSO</title>
+  
+  <!-- PWA & Apple iOS Support -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1d4ed8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SKPI SSO">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glass-panel-blue {
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(37, 99, 235, 0.95));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300 flex flex-col justify-between relative overflow-x-hidden">
+
+  <!-- Glow Backgrounds -->
+  <div class="fixed -top-24 -left-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="fixed -bottom-24 -right-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="w-full max-w-5xl mx-auto px-4 py-4 flex items-center justify-between z-10">
+    <div class="flex items-center gap-3">
+      <img src="LOGO-SEKOLAH.png" 
+           alt="Logo SKPI" 
+           onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%232563eb\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M22 10v6M2 10l10-5 10 5-10 5z\'/><path d=\'M6 12v5c3 3 9 3 12 0v-5\'/></svg>';"
+           class="w-10 h-10 object-contain drop-shadow">
+           
+      <div>
+        <h1 class="font-bold text-base sm:text-lg leading-tight tracking-wide text-blue-700 dark:text-blue-400">HUB AKSES DIGITAL SKPI</h1>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Portal SSO Pembelajaran SK Pulau Indah</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="hidden sm:flex items-center gap-2.5 bg-white/50 dark:bg-slate-800/50 backdrop-blur px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs shadow-sm">
+        <img src="304.png" 
+             alt="Sir Fahmi Rahim" 
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/40?text=DEV';"
+             class="w-7 h-7 rounded-full object-cover border border-blue-500/50">
+        
+        <div class="flex flex-col text-left leading-tight">
+          <span class="text-[9px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">DEVELOPED BY</span>
+          <span class="font-bold text-slate-700 dark:text-slate-200">Sir Fahmi Rahim</span>
+        </div>
+      </div>
+
+      <button id="themeToggle" onclick="toggleTheme()" class="p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+        <i id="themeIcon" data-lucide="moon" class="w-4 h-4 text-slate-700 dark:text-amber-400"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="w-full max-w-5xl mx-auto px-4 py-4 my-auto z-10">
+    <div class="glass-card rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12">
+      
+      <!-- Borang SSO Utama -->
+      <div class="p-6 sm:p-8 md:col-span-7 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800">
+        <div>
+          <div class="mb-5">
+            <h2 class="text-xl font-bold text-slate-800 dark:text-white">Smart SSO Gateway</h2>
+            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-0.5">Pilih maklumat murid untuk membuka pautan aplikasi</p>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label for="tahun" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">1. Pilih Tahun / Tingkatan:</label>
+              <select id="tahun" onchange="updateKelasDropdown()" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm transition">
+                <option value="">⌛ Sedang memuatkan data murid...</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="kelas" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">2. Pilih Kelas:</label>
+              <select id="kelas" onchange="updateStudentDropdown()" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
+                <option value="">-- Sila Pilih Tahun Terlebih Dahulu --</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="murid" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">3. Pilih Nama Murid:</label>
+              <select id="murid" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
+                <option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ID Display Box & Utiliti -->
+          <div class="mt-4 p-3.5 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-center relative">
+            <span class="block text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">ID DELIMa Murid:</span>
+            <span id="emailDisplay" class="font-mono text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 mt-0.5 block break-all">-- Belum Dipilih --</span>
+
+            <!-- Pautan Utiliti: Log Keluar & Reset Kata Laluan Telegram -->
+            <div class="mt-3 pt-2.5 border-t border-blue-200/60 dark:border-blue-800/40 flex items-center justify-between text-[11px]">
+              
+              <!-- Butang Log Keluar Akaun Google Sedia Ada -->
+              <a href="https://accounts.google.com/Logout" target="_blank" title="Log keluar semua akaun Google lama di PC ini" class="text-rose-600 dark:text-rose-400 font-semibold hover:underline flex items-center gap-1 transition">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                <span>Log Keluar PC</span>
+              </a>
+
+              <!-- Link ke Bot Telegram Reset Password -->
+              <a id="btnResetPass" href="https://t.me/Sistem_ID_DELIMa_SKPI_bot" target="_blank" class="text-amber-600 dark:text-amber-400 font-semibold hover:underline flex items-center gap-1 transition">
+                <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
+                <span>Lupa Kata Laluan?</span>
+              </a>
+
+            </div>
+          </div>
+
+          <!-- Pilihan Aplikasi Destinasi -->
+          <div class="mt-5">
+            <span class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">4. Pilih Aplikasi Sasaran:</span>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <button class="btn-target col-span-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white disabled:text-slate-400 font-bold text-xs rounded-xl shadow-lg shadow-blue-500/20 disabled:shadow-none flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="delima" disabled>
+                <i data-lucide="rocket" class="w-4 h-4"></i>
+                <span>PORTAL DELIMA 3.0</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="classroom" disabled>
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>Classroom</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="ains" disabled>
+                <i data-lucide="library" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>AINS (Nilam)</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="gmail" disabled>
+                <i data-lucide="mail" class="w-3.5 h-3.5 text-red-400"></i>
+                <span>Gmail</span>
+              </button>
+
+              <button class="btn-target py-2.5 px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-800/80 dark:hover:bg-slate-700 disabled:bg-slate-200 dark:disabled:bg-slate-900 text-slate-100 disabled:text-slate-400 font-semibold text-xs rounded-lg border border-slate-700/50 flex items-center justify-center gap-2 transition disabled:cursor-not-allowed" data-target="canva" disabled>
+                <i data-lucide="palette" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Canva</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Kad Informasi & Panduan -->
+      <div class="glass-panel-blue p-6 sm:p-8 md:col-span-5 text-white flex flex-col justify-between">
+        <div>
+          <div class="text-center mb-6">
+            <div class="w-12 h-12 mx-auto bg-white/10 rounded-full flex items-center justify-center mb-2 backdrop-blur">
+              <i data-lucide="shield-check" class="w-6 h-6 text-emerald-300"></i>
+            </div>
+            <p class="text-[10px] uppercase tracking-widest text-blue-200 font-semibold">HUB AKSES DIGITAL</p>
+            <h3 class="text-lg font-bold">SK PULAU INDAH</h3>
+          </div>
+
+          <div class="border border-white/20 rounded-xl p-4 backdrop-blur-md bg-white/5 space-y-3 text-xs leading-relaxed text-blue-50">
+            <p>💡 Panduan Penggunaan:</p>
+            <ol class="list-decimal list-inside space-y-1.5 opacity-90">
+              <li>Pilih <strong>Tahun</strong>, <strong>Kelas</strong>, dan <strong>Nama Murid</strong>.</li>
+              <li>ID DELIMa akan dipaparkan secara automatik.</li>
+              <li>Klik mana-mana butang aplikasi sasaran.</li>
+            </ol>
+            <hr class="border-dashed border-white/20 my-2">
+            <p class="text-[11px] opacity-80">Sistem akan log masuk akaun Google murid dan membuka portal aplikasi sasaran secara pantas.</p>
+          </div>
+        </div>
+
+        <div class="mt-6 text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-[11px] text-blue-100 font-medium">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span>Sistem SSO Selamat & Pantas</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="w-full text-center py-4 text-xs text-slate-500 dark:text-slate-400 z-10 px-4">
+    <p>Hak Cipta Terpelihara © SK Pulau Indah | Kementerian Pendidikan Malaysia</p>
+    <p class="mt-1">Hub Akses Digital dibangunkan oleh <span class="font-semibold text-slate-700 dark:text-slate-300">Sir Fahmi Rahim</span></p>
+  </footer>
+
+  <!-- MODAL REDIRECT OVERLAY -->
+  <div id="redirectModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-card bg-slate-900/90 border border-blue-500/30 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative animate-in fade-in zoom-in duration-300">
+      
+      <div class="w-14 h-14 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-400"></i>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-0.5">Log Masuk Berjaya!</h3>
+      <p id="modalNama" class="text-xs font-semibold text-blue-400 uppercase tracking-wide mb-3 px-2">
+        NAMA MURID
+      </p>
+
+      <div class="bg-blue-950/50 border border-blue-500/30 rounded-xl py-2.5 px-3 mb-3">
+        <span class="block text-[10px] font-bold text-blue-300/80 uppercase tracking-wider mb-0.5">ID DELIMa (Disalin Automatik)</span>
+        <span id="modalEmail" class="font-mono text-xs sm:text-sm font-bold text-slate-100 break-all">
+          email@moe-dl.edu.my
+        </span>
+      </div>
+
+      <div class="mb-4">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600/80 border border-blue-400/30 text-white font-bold text-[10px] rounded-full uppercase tracking-wider shadow-sm">
+          <i data-lucide="external-link" class="w-3 h-3"></i>
+          <span id="modalAppName">DELIMA</span>
+        </span>
+      </div>
+
+      <p class="text-[11px] text-slate-300 mb-4">
+        Mengalihkan ke portal dalam beberapa saat...
+      </p>
+
+      <div class="w-full py-2.5 bg-slate-800/80 border border-slate-700 text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center gap-2">
+        <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-400"></i>
+        <span>Sila tunggu sebentar...</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BANNER INSTALL PWA -->
+  <div id="pwaInstallBanner" class="hidden fixed bottom-4 left-4 right-4 max-w-md mx-auto z-50 bg-slate-900/95 text-white p-4 rounded-2xl shadow-2xl border border-blue-500/50 backdrop-blur-md transition-all duration-300">
+    <div class="flex items-center gap-3">
+      <img src="icon-192.png" alt="SKPI SSO Logo" class="w-11 h-11 rounded-xl border border-blue-400/30 object-cover" onerror="this.src='LOGO-SEKOLAH.png'">
+      <div class="flex-1">
+        <h4 class="font-bold text-sm text-white">Pasang Aplikasi SKPI SSO</h4>
+        <p class="text-[11px] text-slate-300">Akses pantas terus dari Skrin Utama tanpa buka pelayar web.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 mt-3">
+      <button id="btnInstallPWA" class="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-blue-500/30">
+        📲 Pasang Sekarang
+      </button>
+      <button onclick="dismissInstallBanner()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl">
+        Nanti
+      </button>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz8UCKh3OyzTbnQ0mirQGSK1QRk9LtLZ05ReWwD4HqYp_oeAFKlrQmV1zv60-8bLZ6KPg/exec";
+    
+    // Reset modal dan form bila kembali ke halaman (elak stuck selepas guna)
+    function resetAppState() {
+      // Sembunyi modal redirect
+      const redirectModal = document.getElementById('redirectModal');
+      if (redirectModal) {
+        redirectModal.classList.add('hidden');
+      }
+
+      // Reset paparan ID DELIMa
+      const emailDisplay = document.getElementById('emailDisplay');
+      if (emailDisplay) {
+        emailDisplay.textContent = "-- Belum Dipilih --";
+      }
+
+      // Reset butang reset password
+      const btnResetPass = document.getElementById('btnResetPass');
+      if (btnResetPass) {
+        btnResetPass.href = "https://t.me/Sistem_ID_DELIMa_SKPI_bot";
+      }
+
+      // Disable kesemua butang aplikasi
+      document.querySelectorAll('.btn-target').forEach(btn => btn.disabled = true);
+
+      // Reset dropdown murid
+      const muridSelect = document.getElementById('murid');
+      if (muridSelect) {
+        muridSelect.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
+        muridSelect.value = "";
+        muridSelect.disabled = true;
+      }
+
+      // Reset dropdown kelas (kekal tahun dipilih kalau masih ada, tapi pastikan konsisten)
+      const kelasSelect = document.getElementById('kelas');
+      if (kelasSelect) {
+        const tahunSelect = document.getElementById('tahun');
+        if (tahunSelect && tahunSelect.value && dbData && dbData[tahunSelect.value]) {
+          // Jika tahun masih dipilih, reload semula kelas
+          kelasSelect.innerHTML = '<option value="">-- Sila Pilih Kelas --</option>';
+          for (let kelas in dbData[tahunSelect.value]) {
+            let opt = document.createElement('option');
+            opt.value = kelas;
+            opt.innerHTML = kelas;
+            kelasSelect.appendChild(opt);
+          }
+          kelasSelect.disabled = false;
+        } else {
+          kelasSelect.innerHTML = '<option value="">-- Sila Pilih Tahun Terlebih Dahulu --</option>';
+          kelasSelect.value = "";
+          kelasSelect.disabled = true;
+        }
+      }
+    }
+    
+    window.addEventListener('pageshow', function(event) {
+      // Jalankan walaupun datang dari bfcache
+      resetAppState();
+    });
+    
+    window.addEventListener('load', function() {
+      resetAppState();
+    });
+    
+    let dbData = {};
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeIcon(isDark);
+    }
+
+    function updateThemeIcon(isDark) {
+      const themeIcon = document.getElementById('themeIcon');
+      if (isDark) {
+        themeIcon.setAttribute('data-lucide', 'sun');
+        themeIcon.className = 'w-4 h-4 text-amber-400';
+      } else {
+        themeIcon.setAttribute('data-lucide', 'moon');
+        themeIcon.className = 'w-4 h-4 text-slate-700';
+      }
+      lucide.createIcons();
+    }
+
+    (function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+        updateThemeIcon(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        updateThemeIcon(false);
+      }
+    })();
+
+    window.onload = function() {
+      const tahunSelect = document.getElementById('tahun');
+
+      if (!GAS_API_URL || GAS_API_URL.includes("TAMPAL_WEB_APP_URL")) {
+        tahunSelect.innerHTML = '<option value="">⚠️ Sila masukkan URL Web App dalam kod dahulu!</option>';
+        return;
+      }
+
+      fetch(GAS_API_URL)
+        .then(response => {
+          if (!response.ok) throw new Error("Gagal menyambung ke server");
+          return response.json();
+        })
+        .then(data => {
+          dbData = data;
+          tahunSelect.innerHTML = '<option value="">-- Sila Pilih Tahun --</option>';
+          
+          const keys = Object.keys(dbData);
+          if (keys.length === 0) {
+            tahunSelect.innerHTML = '<option value="">⚠️ Tiada data dijumpai dalam Google Sheet</option>';
+            return;
+          }
+
+          keys.forEach(tahun => {
+            let opt = document.createElement('option');
+            opt.value = tahun;
+            opt.innerHTML = tahun;
+            tahunSelect.appendChild(opt);
+          });
+        })
+        .catch(err => {
+          console.error("Gagal memuatkan API:", err);
+          tahunSelect.innerHTML = '<option value="">❌ Gagal memuatkan data. Sila muat semula laman.</option>';
+        });
+    };
+
+    function updateKelasDropdown() {
+      let tahun = document.getElementById('tahun').value;
+      let kelasSelect = document.getElementById('kelas');
+      let muridSelect = document.getElementById('murid');
+
+      kelasSelect.innerHTML = '<option value="">-- Sila Pilih Kelas --</option>';
+      muridSelect.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
+      muridSelect.disabled = true;
+      resetStudentSelection();
+
+      if (tahun && dbData[tahun]) {
+        kelasSelect.disabled = false;
+        for (let kelas in dbData[tahun]) {
+          let opt = document.createElement('option');
+          opt.value = kelas;
+          opt.innerHTML = kelas;
+          kelasSelect.appendChild(opt);
+        }
+      } else {
+        kelasSelect.disabled = true;
+      }
+    }
+
+    function updateStudentDropdown() {
+      let tahun = document.getElementById('tahun').value;
+      let kelas = document.getElementById('kelas').value;
+      let muridSelect = document.getElementById('murid');
+      
+      muridSelect.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
+      resetStudentSelection();
+      
+      if (tahun && kelas && dbData[tahun] && dbData[tahun][kelas]) {
+        muridSelect.disabled = false;
+        dbData[tahun][kelas].forEach(function(student) {
+          let opt = document.createElement('option');
+          opt.value = student.email;
+          opt.innerHTML = student.nama;
+          muridSelect.appendChild(opt);
+        });
+      } else {
+        muridSelect.disabled = true;
+      }
+    }
+
+    // LISTENER PILIH MURID + SUNTIK ID PENUH KE BOT TELEGRAM
+    document.getElementById('murid').addEventListener('change', function() {
+      let email = this.value;
+      let emailDisplay = document.getElementById('emailDisplay');
+      let targetButtons = document.querySelectorAll('.btn-target');
+      let btnResetPass = document.getElementById('btnResetPass');
+
+      if (email) {
+        emailDisplay.textContent = email;
+        targetButtons.forEach(btn => btn.disabled = false);
+
+        // Hantar e-mel PENUH (bersama @moe-dl.edu.my) ke Bot Telegram Reset Password
+        if (btnResetPass) {
+          btnResetPass.href = `https://t.me/Sistem_ID_DELIMa_SKPI_bot?start=${encodeURIComponent(email)}`;
+        }
+      } else {
+        resetStudentSelection();
+      }
+    });
+
+    function resetStudentSelection() {
+      document.getElementById('emailDisplay').textContent = "-- Belum Dipilih --";
+      document.querySelectorAll('.btn-target').forEach(btn => btn.disabled = true);
+      
+      let btnResetPass = document.getElementById('btnResetPass');
+      if (btnResetPass) {
+        btnResetPass.href = "https://t.me/Sistem_ID_DELIMa_SKPI_bot";
+      }
+    }
+
+    // -----------------------------------------------------------
+    // LOGIK REDIRECT PANTAS, DIRECT OAUTH & KALIS-CACHE MAKMAL PC
+    // -----------------------------------------------------------
+    function getRedirectUrl(targetKey, email) {
+      const encodedEmail = encodeURIComponent(email);
+      
+      switch (targetKey) {
+        case 'delima':
+          // Direct OAuth 2.0 Rasmi DELIMa + prompt=select_account (Pantas & Kalis Akaun Lama)
+          const clientId = "950472034074-acj262jqk6trve8i4ndsudqeokvh5pef.apps.googleusercontent.com";
+          const redirectUri = "https://d3.delima.edu.my/authentication/code";
+          const scope = "openid email profile";
+
+          return "https://accounts.google.com/o/oauth2/v2/auth?" +
+            "client_id=" + clientId +
+            "&redirect_uri=" + encodeURIComponent(redirectUri) +
+            "&response_type=code" +
+            "&scope=" + encodeURIComponent(scope) +
+            "&login_hint=" + encodedEmail +
+            "&prompt=select_account" +
+            "&hd=moe-dl.edu.my";
+
+        case 'classroom':
+          // Tumpu pada Emel Murid Ini + Paksa Minta Akaun/Kata Laluan
+          return "https://accounts.google.com/AccountChooser/identifier?" +
+            "continue=" + encodeURIComponent("https://classroom.google.com") +
+            "&Email=" + encodedEmail +
+            "&prompt=select_account" +
+            "&hl=ms";
+
+        case 'gmail':
+          // Tumpu pada Gmail Murid Ini
+          return "https://accounts.google.com/AccountChooser/identifier?" +
+            "continue=" + encodeURIComponent("https://mail.google.com") +
+            "&Email=" + encodedEmail +
+            "&prompt=select_account" +
+            "&hl=ms";
+
+        case 'canva':
+          // Buka terus portal log masuk Canva (Atasi ralat 404 Google)
+          return "https://www.canva.com/login";
+
+        case 'ains':
+          return "https://ains.moe.gov.my";
+
+        default:
+          return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail + "&prompt=select_account";
+      }
+    }
+
+    // -----------------------------------------------------------
+    // LOGIK KLIK BUTANG APLIKASI
+    // -----------------------------------------------------------
+    document.querySelectorAll('.btn-target').forEach(btn => {
+      btn.addEventListener('click', function() {
+        let tahun = document.getElementById('tahun').value;
+        let kelas = document.getElementById('kelas').value;
+        let muridSelect = document.getElementById('murid');
+        let email = muridSelect.value;
+        let nama = muridSelect.options[muridSelect.selectedIndex].textContent;
+        let targetKey = this.getAttribute('data-target');
+
+        if (!email) return;
+
+        // 1. Rekod Log ke Google Sheets
+        let logUrl = GAS_API_URL + "?action=log" +
+          "&tahun=" + encodeURIComponent(tahun) +
+          "&kelas=" + encodeURIComponent(kelas) +
+          "&nama=" + encodeURIComponent(nama) +
+          "&email=" + encodeURIComponent(email) +
+          "&app=" + encodeURIComponent(targetKey) +
+          "&source=Web App";
+
+        fetch(logUrl, { mode: 'no-cors' }).catch(() => {});
+
+        // 2. Salin e-mel ke papan klip automatik
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(email).catch(() => {});
+        }
+
+        // 3. Kemaskini Modal Overlay
+        document.getElementById('modalNama').textContent = nama;
+        document.getElementById('modalEmail').textContent = email;
+        document.getElementById('modalAppName').textContent = targetKey.toUpperCase();
+
+        // 4. Papar Modal
+        const redirectModal = document.getElementById('redirectModal');
+        redirectModal.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
+
+        // 5. Alihkan Laman Selepas 1.2 Saat
+        setTimeout(() => {
+          window.location.href = getRedirectUrl(targetKey, email);
+        }, 1200);
+      });
+    });
+
+    // -----------------------------------------------------------
+    // LOGIK PWA INSTALL
+    // -----------------------------------------------------------
+    let deferredPrompt;
+    const pwaBanner = document.getElementById('pwaInstallBanner');
+    const btnInstall = document.getElementById('btnInstallPWA');
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker Berjaya Didaftarkan:', reg.scope))
+          .catch(err => console.error('Pendaftaran Service Worker Gagal:', err));
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      if (!localStorage.getItem('dismissedPWABanner') && pwaBanner) {
+        pwaBanner.classList.remove('hidden');
+      }
+    });
+
+    if (btnInstall) {
+      btnInstall.addEventListener('click', async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            console.log('Pengguna memasang PWA');
+          }
+          deferredPrompt = null;
+          if (pwaBanner) pwaBanner.classList.add('hidden');
+        }
+      });
+    }
+
+    function dismissInstallBanner() {
+      if (pwaBanner) pwaBanner.classList.add('hidden');
+      localStorage.setItem('dismissedPWABanner', 'true');
+    }
+  </script>
+</body>
+</html>
