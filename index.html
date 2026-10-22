@@ -591,14 +591,24 @@
             "&hl=ms";
 
         case 'canva':
-          // Buka terus portal log masuk Canva (Atasi ralat 404 Google)
-          return "https://www.canva.com/login";
+          // Hantar terus ke Google SSO Canva dengan emel murid dipilih
+          return "https://accounts.google.com/AccountChooser/identifier?" +
+            "continue=" + encodeURIComponent("https://www.canva.com/login/google") +
+            "&Email=" + encodedEmail +
+            "&prompt=select_account" +
+            "&hl=ms";
 
         case 'ains':
-          return "https://ains.moe.gov.my";
+          // AINS kebiasaannya guna SSO/MOE. Cuba terus ke AINS dengan emel dipaparkan
+          // Guna AccountChooser supaya murid terus pilih akaun moe-dl.edu.my
+          return "https://accounts.google.com/AccountChooser/identifier?" +
+            "continue=" + encodeURIComponent("https://ains.moe.gov.my/") +
+            "&Email=" + encodedEmail +
+            "&prompt=select_account" +
+            "&hl=ms";
 
         default:
-          return "https://accounts.google.com/AccountChooser?Email=" + encodedEmail + "&prompt=select_account";
+          return "https://accounts.google.com/AccountChooser/identifier?Email=" + encodedEmail + "&prompt=select_account";
       }
     }
 
