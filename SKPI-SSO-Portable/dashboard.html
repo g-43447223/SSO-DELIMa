@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ms" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Analisis - Hub Akses Digital SKPI</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans p-4 sm:p-8 transition-colors duration-300">
+
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+    <div>
+      <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+        <i data-lucide="layout-dashboard"></i> DASHBOARD ANALISIS PENGGUNAAN
+      </h1>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Hub Akses Digital & Extension SSO • SK Pulau Indah</p>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <a href="./index.html" class="px-3 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-bold rounded-xl flex items-center gap-2 transition">
+        <i data-lucide="home" class="w-4 h-4"></i> Portal SSO
+      </a>
+      <button onclick="toggleTheme()" class="p-2.5 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs transition" title="Tukar tema">
+        <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
+      </button>
+      <button onclick="fetchAnalyticsData()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold rounded-xl flex items-center gap-2 shadow-lg transition">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Muat Semula Data
+      </button>
+    </div>
+  </header>
+
+  <!-- Filter Tarikh & Lain-lain -->
+  <section class="max-w-7xl mx-auto mb-6">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-4 rounded-2xl flex flex-col gap-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="setQuickFilter('today')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Hari Ini
+        </button>
+        <button onclick="setQuickFilter('week')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="calendar-range" class="w-3.5 h-3.5"></i> Minggu Ini
+        </button>
+        <button onclick="setQuickFilter('month')" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+          <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Bulan Ini
+        </button>
+      </div>
+      <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="dateFrom" class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Dari Tarikh</label>
+          <input type="date" id="dateFrom" class="px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="dateTo" class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Hingga Tarikh</label>
+          <input type="date" id="dateTo" class="px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="filterTahun" class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Tahun</label>
+          <select id="filterTahun" class="px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Semua Tahun</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="filterKelas" class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Kelas</label>
+          <select id="filterKelas" class="px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Semua Kelas</option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1 flex-1 sm:flex-none">
+          <label for="filterApp" class="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Aplikasi</label>
+          <select id="filterApp" class="px-3 py-2 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">Semua Aplikasi</option>
+            <option value="DELIMA">DELIMA</option>
+            <option value="CLASSROOM">CLASSROOM</option>
+            <option value="AINS">AINS</option>
+            <option value="GMAIL">GMAIL</option>
+            <option value="CANVA">CANVA</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button onclick="applyAllFilters()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-lg shadow-emerald-500/10">
+            <i data-lucide="filter" class="w-4 h-4"></i> Tapis
+          </button>
+          <button onclick="resetAllFilters()" class="px-4 py-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 text-xs font-bold rounded-xl flex items-center gap-2 transition">
+            <i data-lucide="x" class="w-4 h-4"></i> Reset Semua
+          </button>
+          <button onclick="exportFilteredToCSV()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-xs font-bold rounded-xl flex items-center gap-2 transition shadow-lg shadow-blue-500/10">
+            <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+          </button>
+        </div>
+        <div class="text-[11px] text-slate-500 dark:text-slate-400">
+          <span id="filterInfo" class="italic">Menunjukkan semua rekod</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="max-w-7xl mx-auto space-y-6">
+
+    <!-- KPI Ringkasan Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Jumlah Akses</span>
+          <div id="totalLogins" class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">0</div>
+        </div>
+        <div class="p-3 bg-blue-500/10 rounded-xl text-blue-600 dark:text-blue-400"><i data-lucide="mouse-pointer-click"></i></div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pengguna Unik</span>
+          <div id="uniqueUsers" class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
+        </div>
+        <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-600 dark:text-emerald-400"><i data-lucide="users"></i></div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Aplikasi Popular</span>
+          <div id="topApp" class="text-lg font-bold text-amber-600 dark:text-amber-400 mt-1 truncate max-w-[150px]">-</div>
+        </div>
+        <div class="p-3 bg-amber-500/10 rounded-xl text-amber-600 dark:text-amber-400"><i data-lucide="trophy"></i></div>
+      </div>
+
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nisbah Platform</span>
+          <div id="platformRatio" class="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-1">Web: 0 | Ext: 0</div>
+        </div>
+        <div class="p-3 bg-indigo-500/10 rounded-xl text-indigo-400"><i data-lucide="monitor"></i></div>
+      </div>
+
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Chart: Popularitas Aplikasi -->
+      <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
+        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i> Pecahan Mengikut Aplikasi
+        </h3>
+        <div class="relative h-64">
+          <canvas id="appChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart: Penglibatan Mengikut Tahun -->
+      <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
+        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+          <i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i> Penglibatan Mengikut Tahun / Tingkatan
+        </h3>
+        <div class="relative h-64">
+          <canvas id="yearChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Chart: Penglibatan Mengikut Jam -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+      <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+        <i data-lucide="clock" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i> Penglibatan Mengikut Jam (Waktu Guna)
+      </h3>
+      <div class="relative h-64">
+        <canvas id="hourChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Top 5 Murid Aktif -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+      <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+        <i data-lucide="award" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i> Top 5 Murid Paling Aktif
+      </h3>
+      <ul id="topStudents" class="space-y-2 text-xs text-slate-700 dark:text-slate-300">
+        <li class="text-slate-500">Tiada data.</li>
+      </ul>
+    </div>
+
+    <!-- Log Aktiviti Terkini Table -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+      <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+        <i data-lucide="history" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i> Rekod Log Masuk Terkini
+      </h3>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+          <thead class="bg-slate-100 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="p-3">Masa</th>
+              <th class="p-3">Nama Murid</th>
+              <th class="p-3">Tahun & Kelas</th>
+              <th class="p-3">Aplikasi Sasaran</th>
+              <th class="p-3">Platform</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody" class="divide-y divide-slate-800/50">
+            <tr>
+              <td colspan="5" class="p-4 text-center text-slate-500">⌛ Memuatkan data log...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // GANTIKAN DENGAN WEB APP URL ANDA DARIPADA GOOGLE APPS SCRIPT
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz8UCKh3OyzTbnQ0mirQGSK1QRk9LtLZ05ReWwD4HqYp_oeAFKlrQmV1zv60-8bLZ6KPg/exec";
+
+     function updateThemeIcon(isDark) {
+       const themeIcon = document.getElementById('themeIcon');
+       if (!themeIcon) return;
+       themeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+       if (window.lucide) lucide.createIcons();
+     }
+     function toggleTheme() {
+       const isDark = document.documentElement.classList.toggle('dark');
+       localStorage.setItem('theme', isDark ? 'dark' : 'light');
+       document.body.className = isDark
+         ? 'bg-slate-950 text-slate-100 min-h-screen font-sans p-4 sm:p-8'
+         : 'bg-slate-100 text-slate-800 min-h-screen font-sans p-4 sm:p-8';
+       updateThemeIcon(isDark);
+     }
+     (function initTheme() {
+       const saved = localStorage.getItem('theme');
+       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+       const isDark = saved ? saved === 'dark' : prefersDark;
+       if (isDark) document.documentElement.classList.add('dark');
+       else document.documentElement.classList.remove('dark');
+       document.body.className = isDark
+         ? 'bg-slate-950 text-slate-100 min-h-screen font-sans p-4 sm:p-8'
+         : 'bg-slate-100 text-slate-800 min-h-screen font-sans p-4 sm:p-8';
+       updateThemeIcon(isDark);
+     })();
+
+    let appChartInstance = null;
+    let yearChartInstance = null;
+
+    let allLogs = [];
+    let currentFilteredLogs = [];
+
+     window.onload = function() {
+       fetchAnalyticsData();
+       setInterval(fetchAnalyticsData, 120000);
+       if (window.lucide) lucide.createIcons();
+     };
+
+    function fetchAnalyticsData() {
+      if (!GAS_API_URL || GAS_API_URL.includes("TAMPAL_WEB_APP_URL")) {
+        alert("Sila masukkan URL Google Apps Script yang betul dalam dashboard.html!");
+        return;
+      }
+
+      fetch(GAS_API_URL + "?action=analytics")
+        .then(res => { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+        .then(data => {
+          allLogs = data.logs || [];
+          populateFilterDropdowns();
+          applyAllFilters();
+        })
+        .catch(err => {
+          console.error("Gagal mengambil data:", err);
+          const tbody = document.getElementById('logTableBody');
+          if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-rose-400">Gagal memuatkan data. Sila cuba lagi.</td></tr>';
+          alert("Gagal memuatkan data analitik. Semak sambungan internet / URL GAS.");
+        });
+    }
+
+    function populateFilterDropdowns() {
+      const tahunSet = new Set();
+      const kelasSet = new Set();
+      allLogs.forEach(l => {
+        if (l.tahun) tahunSet.add(l.tahun);
+        if (l.kelas) kelasSet.add(l.kelas);
+      });
+
+      const filterTahun = document.getElementById('filterTahun');
+      const filterKelas = document.getElementById('filterKelas');
+      if (!filterTahun || !filterKelas) return;
+
+      // Clear existing except first
+      filterTahun.querySelectorAll('option:not(:first-child)').forEach(o => o.remove());
+      Array.from(tahunSet).sort().forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        filterTahun.appendChild(opt);
+      });
+
+      filterKelas.querySelectorAll('option:not(:first-child)').forEach(o => o.remove());
+      Array.from(kelasSet).sort().forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = k;
+        filterKelas.appendChild(opt);
+      });
+    }
+
+    function applyAllFilters() {
+      const dateFromInput = document.getElementById('dateFrom').value;
+      const dateToInput = document.getElementById('dateTo').value;
+      const filterTahun = document.getElementById('filterTahun').value;
+      const filterKelas = document.getElementById('filterKelas').value;
+      const filterApp = document.getElementById('filterApp').value;
+      const filterInfo = document.getElementById('filterInfo');
+
+      let filtered = allLogs.filter(l => {
+         // Date filter
+         if (dateFromInput || dateToInput) {
+           if (!l.masa) return false;
+           const logDate = new Date(l.masa);
+           if (isNaN(logDate.getTime())) return false;
+           const logDateOnly = new Date(logDate.getFullYear(), logDate.getMonth(), logDate.getDate());
+           if (dateFromInput && dateToInput) {
+             const from = new Date(dateFromInput + 'T00:00:00');
+             const to = new Date(dateToInput + 'T23:59:59');
+             if (!(logDateOnly >= from && logDateOnly <= to)) return false;
+           } else if (dateFromInput) {
+             const from = new Date(dateFromInput + 'T00:00:00');
+             if (logDateOnly < from) return false;
+           } else if (dateToInput) {
+             const to = new Date(dateToInput + 'T23:59:59');
+             if (logDateOnly > to) return false;
+           }
+         }
+
+        // Other filters
+        if (filterTahun && l.tahun !== filterTahun) return false;
+        if (filterKelas && l.kelas !== filterKelas) return false;
+        if (filterApp && (l.app || "").toUpperCase() !== filterApp) return false;
+
+        return true;
+      });
+
+      currentFilteredLogs = filtered;
+
+      // Build info text
+      let infoParts = [];
+      if (dateFromInput && dateToInput) infoParts.push(`${dateFromInput} - ${dateToInput}`);
+      else if (dateFromInput) infoParts.push(`Dari ${dateFromInput}`);
+      else if (dateToInput) infoParts.push(`Hingga ${dateToInput}`);
+      if (filterTahun) infoParts.push(`Tahun: ${filterTahun}`);
+      if (filterKelas) infoParts.push(`Kelas: ${filterKelas}`);
+      if (filterApp) infoParts.push(`App: ${filterApp}`);
+      if (infoParts.length === 0) {
+        filterInfo.textContent = `Menunjukkan semua rekod (${filtered.length} rekod)`;
+      } else {
+        filterInfo.textContent = `Tapis: ${infoParts.join(' | ')} (${filtered.length} rekod)`;
+      }
+
+      processAnalytics(filtered);
+    }
+
+    function formatDateForInput(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    function setQuickFilter(type) {
+      const dateFrom = document.getElementById('dateFrom');
+      const dateTo = document.getElementById('dateTo');
+      if (!dateFrom || !dateTo) return;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      if (type === 'today') {
+        dateFrom.value = formatDateForInput(today);
+        dateTo.value = formatDateForInput(today);
+      } else if (type === 'week') {
+        // Mula Isnin
+        const day = today.getDay(); // 0 Ahad, 1 Isnin
+        const diff = (day === 0) ? -6 : 1 - day;
+        const monday = new Date(today);
+        monday.setDate(today.getDate() + diff);
+        dateFrom.value = formatDateForInput(monday);
+        dateTo.value = formatDateForInput(today);
+      } else if (type === 'month') {
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        dateFrom.value = formatDateForInput(firstDay);
+        dateTo.value = formatDateForInput(today);
+      }
+
+      applyAllFilters();
+    }
+
+    function resetAllFilters() {
+      document.getElementById('dateFrom').value = "";
+      document.getElementById('dateTo').value = "";
+      document.getElementById('filterTahun').value = "";
+      document.getElementById('filterKelas').value = "";
+      document.getElementById('filterApp').value = "";
+      document.getElementById('filterInfo').textContent = "Menunjukkan semua rekod";
+      applyAllFilters();
+    }
+
+    function exportFilteredToCSV() {
+      const logs = currentFilteredLogs.length > 0 ? currentFilteredLogs : allLogs;
+      if (!logs || logs.length === 0) {
+        alert("Tiada data untuk dieksport.");
+        return;
+      }
+
+      const headers = ['Masa', 'Nama Murid', 'Tahun', 'Kelas', 'Email', 'Aplikasi', 'Platform'];
+      let csv = headers.join(',') + '\r\n';
+
+       logs.forEach(l => {
+         const dateObj = new Date(l.masa);
+         const masa = isNaN(dateObj.getTime()) ? (l.masa || '') : dateObj.toLocaleString('ms-MY');
+         const esc = v => String(v || '').replace(/"/g, '""');
+         const nama = esc(l.nama);
+         const tahun = esc(l.tahun);
+         const kelas = esc(l.kelas);
+         const email = esc(l.email);
+         const app = esc((l.app || '').toUpperCase());
+         const source = esc(l.source || 'Web');
+         csv += `"${masa}","${nama}","${tahun}","${kelas}","${email}","${app}","${source}"\r\n`;
+       });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      const dateStr = new Date().toISOString().slice(0,10);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Laporan_SSO_DELIMa_${dateStr}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function applyDateFilter() {
+      applyAllFilters();
+    }
+
+    function resetDateFilter() {
+      resetAllFilters();
+    }
+
+    function processAnalytics(logs) {
+      document.getElementById('totalLogins').textContent = logs.length;
+
+      // Unique Users
+      const uniqueEmails = new Set(logs.map(l => l.email));
+      document.getElementById('uniqueUsers').textContent = uniqueEmails.size;
+
+      // Aggregations
+      const appCounts = {};
+      const yearCounts = {};
+      const hourCounts = {};
+      let webCount = 0;
+      let extCount = 0;
+
+      for (let h = 0; h < 24; h++) {
+        hourCounts[h] = 0;
+      }
+
+      logs.forEach(l => {
+        // App Counts
+        let appName = (l.app || "").toUpperCase();
+        if (appName) {
+          appCounts[appName] = (appCounts[appName] || 0) + 1;
+        }
+
+        // Year Counts
+        let yearName = l.tahun || "Lain-lain";
+        yearCounts[yearName] = (yearCounts[yearName] || 0) + 1;
+
+        // Source Counts
+        if (l.source === "Extension") extCount++;
+        else webCount++;
+
+        // Hour Counts
+        if (l.masa) {
+          const d = new Date(l.masa);
+          if (!isNaN(d.getTime())) {
+            const hour = d.getHours();
+            hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+          }
+        }
+      });
+
+      // Top App
+      let topApp = "-";
+      let maxAppCount = 0;
+      for (let app in appCounts) {
+        if (appCounts[app] > maxAppCount) {
+          maxAppCount = appCounts[app];
+          topApp = app;
+        }
+      }
+      document.getElementById('topApp').textContent = topApp;
+      document.getElementById('platformRatio').textContent = `Web: ${webCount} | Ext: ${extCount}`;
+
+      // Render Charts
+      renderAppChart(appCounts);
+      renderYearChart(yearCounts);
+      renderHourChart(hourCounts);
+
+      // Render Table (Tunjuk 15 log terkini)
+      renderLogTable([...logs].reverse().slice(0, 15));
+       renderTopStudents(logs);
+    }
+
+    function renderAppChart(appData) {
+      const ctx = document.getElementById('appChart').getContext('2d');
+      if (appChartInstance) appChartInstance.destroy();
+
+      appChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(appData),
+          datasets: [{
+            data: Object.values(appData),
+            backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#06b6d4'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    let hourChartInstance = null;
+
+    function renderYearChart(yearData) {
+      const ctx = document.getElementById('yearChart').getContext('2d');
+      if (yearChartInstance) yearChartInstance.destroy();
+
+      yearChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(yearData),
+          datasets: [{
+            label: 'Jumlah Akses',
+            data: Object.values(yearData),
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderHourChart(hourData) {
+      const canvas = document.getElementById('hourChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (hourChartInstance) hourChartInstance.destroy();
+
+      const labels = [];
+      const dataArr = [];
+      for (let h = 0; h < 24; h++) {
+        labels.push(h.toString().padStart(2,'0') + ':00');
+        dataArr.push(hourData[h] || 0);
+      }
+
+      hourChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jumlah Akses',
+            data: dataArr,
+            backgroundColor: '#f59e0b',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { ticks: { color: '#94a3b8', maxTicksLimit: 12 }, grid: { display: false } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderTopStudents(logs) {
+      const ul = document.getElementById('topStudents');
+      if (!ul) return;
+      const counts = {};
+      logs.forEach(l => {
+        const name = l.nama || '-';
+        counts[name] = (counts[name] || 0) + 1;
+      });
+      const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,5);
+      ul.innerHTML = '';
+      if (top.length === 0) {
+        ul.innerHTML = '<li class="text-slate-500">Tiada data.</li>';
+        return;
+      }
+      top.forEach(([name, c], i) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between';
+        const spanName = document.createElement('span');
+        spanName.textContent = (i+1) + '. ' + name;
+        const spanCount = document.createElement('span');
+        spanCount.className = 'font-bold text-amber-600 dark:text-amber-400';
+        spanCount.textContent = c + ' akses';
+        li.appendChild(spanName);
+        li.appendChild(spanCount);
+        ul.appendChild(li);
+      });
+    }
+
+    function renderLogTable(logs) {
+      const tbody = document.getElementById('logTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Tiada log rekod untuk julat tarikh dipilih.</td></tr>';
+        return;
+      }
+
+      logs.forEach(l => {
+        let dateObj = new Date(l.masa);
+        if (isNaN(dateObj.getTime())) {
+          dateObj = new Date();
+        }
+        let timeStr = dateObj.toLocaleDateString('ms-MY') + ' ' + dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+
+        let tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/30 transition";
+         const tdTime = document.createElement('td'); tdTime.className = 'p-3 text-slate-500 dark:text-slate-400'; tdTime.textContent = timeStr; tr.appendChild(tdTime);
+         const tdNama = document.createElement('td'); tdNama.className = 'p-3 font-semibold text-slate-900 dark:text-white'; tdNama.textContent = l.nama || '-'; tr.appendChild(tdNama);
+         const tdTK = document.createElement('td'); tdTK.className = 'p-3'; tdTK.textContent = (l.tahun || '-') + ' - ' + (l.kelas || '-'); tr.appendChild(tdTK);
+         const tdApp = document.createElement('td'); tdApp.className = 'p-3 font-bold text-blue-600 dark:text-blue-400 uppercase'; tdApp.textContent = l.app || '-'; tr.appendChild(tdApp);
+         const tdSrc = document.createElement('td'); tdSrc.className = 'p-3';
+         const span = document.createElement('span');
+         span.className = 'px-2 py-0.5 rounded-md text-[10px] font-bold ' + (l.source === 'Extension' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30');
+         span.textContent = l.source || 'Web';
+         tdSrc.appendChild(span);
+         tr.appendChild(tdSrc);
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>
