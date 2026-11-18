@@ -13,8 +13,8 @@
   <meta name="apple-mobile-web-app-title" content="SKPI SSO">
   <link rel="apple-touch-icon" href="icon-192.png">
   
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="https://unpkg.com/lucide@0.460.0"></script>
   
   <script>
     tailwind.config = {
@@ -88,7 +88,10 @@
         </div>
       </div>
 
-      <button id="themeToggle" onclick="toggleTheme()" class="p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+      <a href="dashboard.html" title="Dashboard Analisis" class="p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center">
+         <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-700 dark:text-blue-400"></i>
+       </a>
+       <button id="themeToggle" onclick="toggleTheme()" class="p-2.5 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
         <i id="themeIcon" data-lucide="moon" class="w-4 h-4 text-slate-700 dark:text-amber-400"></i>
       </button>
     </div>
@@ -122,9 +125,11 @@
             </div>
 
             <div>
-              <label for="murid" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-spte-300 mb-1">3. Pilih Nama Murid:</label>
-              <input type="text" id="muridSearch" list="muridList" disabled placeholder="-- Taip atau pilih nama murid --" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition" autocomplete="off">
-              <datalist id="muridList"></datalist>
+              <label for="muridSearch" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1">3. Pilih Nama Murid:</label>
+              <input type="text" id="muridFilter" oninput="filterMuridList()" placeholder="Taip untuk cari nama murid..." disabled class="w-full mb-1.5 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
+<select id="muridSearch" onchange="handleMuridSearch()" disabled class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed transition">
+                <option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>
+              </select>
               <input type="hidden" id="muridEmail">
             </div>
           </div>
@@ -233,7 +238,7 @@
   </footer>
 
   <!-- MODAL REDIRECT OVERLAY -->
-  <div id="redirectModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+  <div id="redirectModal" role="dialog" aria-modal="true" aria-labelledby="modalNama" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="glass-card bg-slate-900/90 border border-blue-500/30 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl relative animate-in fade-in zoom-in duration-300">
       
       <div class="w-14 h-14 bg-emerald-500/20 border border-emerald-500/40 rounded-2xl flex items-center justify-center mx-auto mb-3">
@@ -294,6 +299,25 @@
     lucide.createIcons();
     
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz8UCKh3OyzTbnQ0mirQGSK1QRk9LtLZ05ReWwD4HqYp_oeAFKlrQmV1zv60-8bLZ6KPg/exec";
+
+     function queueLogUrl(url) {
+       try {
+         const q = JSON.parse(localStorage.getItem('sso_log_queue') || '[]');
+         if (!q.includes(url)) q.push(url);
+         localStorage.setItem('sso_log_queue', JSON.stringify(q.slice(-50)));
+       } catch (e) {}
+     }
+     function flushLogQueue() {
+       try {
+         const q = JSON.parse(localStorage.getItem('sso_log_queue') || '[]');
+         if (!q.length) return;
+         const remaining = [];
+         q.forEach(u => {
+           fetch(u, { mode: 'no-cors' }).catch(() => { remaining.push(u); });
+         });
+         localStorage.setItem('sso_log_queue', JSON.stringify(remaining));
+       } catch (e) {}
+     }
     
     // Reset modal dan form bila kembali ke halaman (elak stuck selepas guna)
     function resetAppState() {
@@ -327,20 +351,15 @@
       // Reset dropdown murid / carian murid
       const muridSearch = document.getElementById('muridSearch');
       const muridEmail = document.getElementById('muridEmail');
-      const muridList = document.getElementById('muridList');
       if (muridSearch) {
+        muridSearch.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
         muridSearch.value = '';
         muridSearch.disabled = true;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = true;
       }
       if (muridEmail) muridEmail.value = '';
-      if (muridList) muridList.innerHTML = '';
       muridListData = [];
-      const muridSelect = document.getElementById('murid');
-      if (muridSelect) {
-        muridSelect.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
-        muridSelect.value = "";
-        muridSelect.disabled = true;
-      }
 
       // Reset dropdown kelas (kekal tahun dipilih kalau masih ada, tapi pastikan konsisten)
       const kelasSelect = document.getElementById('kelas');
@@ -352,7 +371,7 @@
           for (let kelas in dbData[tahunSelect.value]) {
             let opt = document.createElement('option');
             opt.value = kelas;
-            opt.innerHTML = kelas;
+            opt.textContent = kelas;
             kelasSelect.appendChild(opt);
           }
           kelasSelect.disabled = false;
@@ -400,40 +419,27 @@
 
       const muridSearch = document.getElementById('muridSearch');
       const muridEmail = document.getElementById('muridEmail');
-      const muridList = document.getElementById('muridList');
       if (muridSearch) {
-        muridSearch.value = '';
         const tahun = document.getElementById('tahun').value;
         const kelas = document.getElementById('kelas').value;
         if (tahun && kelas && dbData && dbData[tahun] && dbData[tahun][kelas]) {
           muridSearch.disabled = false;
-          if (muridList) {
-            muridList.innerHTML = '';
-            muridListData = dbData[tahun][kelas];
-            muridListData.forEach(function(student) {
-              let opt = document.createElement('option');
-              opt.value = student.nama;
-              opt.setAttribute('data-email', student.email);
-              muridList.appendChild(opt);
-            });
-          } else {
-            muridListData = dbData[tahun][kelas];
-          }
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = false;
+          muridListData = dbData[tahun][kelas];
+          populateMuridSelect();
           setTimeout(() => {
             if (muridSearch && !muridSearch.disabled) muridSearch.focus();
           }, 50);
         } else {
+          muridSearch.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
+          muridSearch.value = '';
           muridSearch.disabled = true;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = true;
         }
       }
       if (muridEmail) muridEmail.value = '';
-
-      const muridSelect = document.getElementById('murid');
-      if (muridSelect) {
-        muridSelect.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
-        muridSelect.value = "";
-        muridSelect.disabled = true;
-      }
 
       if (window.lucide) lucide.createIcons();
     }
@@ -506,7 +512,7 @@
           keys.forEach(tahun => {
             let opt = document.createElement('option');
             opt.value = tahun;
-            opt.innerHTML = tahun;
+            opt.textContent = tahun;
             tahunSelect.appendChild(opt);
           });
 
@@ -545,21 +551,68 @@
 
     let muridListData = [];
 
+    function populateMuridSelect() {
+      const select = document.getElementById('muridSearch');
+      if (!select) return;
+      select.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
+      muridListData.forEach(function(student) {
+        const opt = document.createElement('option');
+        opt.value = student.nama;
+        opt.textContent = student.nama;
+        opt.setAttribute('data-email', student.email);
+        select.appendChild(opt);
+      });
+      select.value = '';
+    }
+
+    function filterMuridList() {
+      const filterInput = document.getElementById('muridFilter');
+      const select = document.getElementById('muridSearch');
+      if (!select) return;
+      const q = (filterInput ? filterInput.value : '').trim().toLowerCase();
+      select.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
+      muridListData.forEach(function(student) {
+        if (!q || (student.nama || '').toLowerCase().includes(q)) {
+          const opt = document.createElement('option');
+          opt.value = student.nama;
+          opt.textContent = student.nama;
+          opt.setAttribute('data-email', student.email);
+          select.appendChild(opt);
+        }
+      });
+      select.value = '';
+    }
+
+    function applySelectedStudent(student) {
+      const muridEmail = document.getElementById('muridEmail');
+      const emailDisplay = document.getElementById('emailDisplay');
+      const targetButtons = document.querySelectorAll('.btn-target');
+      const btnResetPass = document.getElementById('btnResetPass');
+
+      if (muridEmail) muridEmail.value = student.email;
+      if (emailDisplay) emailDisplay.textContent = student.email;
+      targetButtons.forEach(btn => btn.disabled = false);
+      if (btnResetPass) {
+        btnResetPass.href = `https://t.me/Sistem_ID_DELIMa_SKPI_bot?start=${encodeURIComponent(student.email)}`;
+      }
+    }
+
     function updateKelasDropdown() {
       let tahun = document.getElementById('tahun').value;
       let kelasSelect = document.getElementById('kelas');
       let muridSearch = document.getElementById('muridSearch');
-      let muridList = document.getElementById('muridList');
       let muridEmail = document.getElementById('muridEmail');
 
       saveLastSelection();
 
       kelasSelect.innerHTML = '<option value="">-- Sila Pilih Kelas --</option>';
       if (muridSearch) {
+        muridSearch.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
         muridSearch.value = '';
         muridSearch.disabled = true;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = true;
       }
-      if (muridList) muridList.innerHTML = '';
       if (muridEmail) muridEmail.value = '';
       muridListData = [];
       resetStudentSelection();
@@ -569,7 +622,7 @@
         for (let kelas in dbData[tahun]) {
           let opt = document.createElement('option');
           opt.value = kelas;
-          opt.innerHTML = kelas;
+          opt.textContent = kelas;
           kelasSelect.appendChild(opt);
         }
         // Auto-pilih kelas terakhir jika sama
@@ -592,114 +645,56 @@
       let tahun = document.getElementById('tahun').value;
       let kelas = document.getElementById('kelas').value;
       let muridSearch = document.getElementById('muridSearch');
-      let muridList = document.getElementById('muridList');
       let muridEmail = document.getElementById('muridEmail');
       
       saveLastSelection();
       
       if (muridSearch) {
+        muridSearch.innerHTML = '<option value="">-- Sila Pilih Nama Murid --</option>';
         muridSearch.value = '';
         muridSearch.disabled = true;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = true;
       }
-      if (muridList) muridList.innerHTML = '';
       if (muridEmail) muridEmail.value = '';
       muridListData = [];
       resetStudentSelection();
       
       if (tahun && kelas && dbData[tahun] && dbData[tahun][kelas]) {
         if (muridSearch) muridSearch.disabled = false;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = false;
         muridListData = dbData[tahun][kelas];
-        muridListData.forEach(function(student) {
-          if (muridList) {
-            let opt = document.createElement('option');
-            opt.value = student.nama;
-            opt.setAttribute('data-email', student.email);
-            muridList.appendChild(opt);
-          }
-        });
+        populateMuridSelect();
         // Auto-focus ke carian nama murid
         setTimeout(() => {
           if (muridSearch && !muridSearch.disabled) muridSearch.focus();
         }, 100);
       } else {
-        if (muridSearch) muridSearch.disabled = true;
+        if (muridSearch) {
+          muridSearch.innerHTML = '<option value="">-- Sila Pilih Kelas Terlebih Dahulu --</option>';
+          muridSearch.value = '';
+          muridSearch.disabled = true;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = true;
+        }
       }
     }
 
     function handleMuridSearch() {
       const muridSearch = document.getElementById('muridSearch');
-      const muridList = document.getElementById('muridList');
-      const muridEmail = document.getElementById('muridEmail');
-      const emailDisplay = document.getElementById('emailDisplay');
-      const targetButtons = document.querySelectorAll('.btn-target');
-      const btnResetPass = document.getElementById('btnResetPass');
 
       if (!muridSearch) return;
-      const val = muridSearch.value.trim().toLowerCase();
-      
-      if (!val) {
-        if (muridEmail) muridEmail.value = '';
+      const nama = (muridSearch.value || '').trim();
+      const selectedOption = muridSearch.options[muridSearch.selectedIndex];
+      const email = selectedOption ? selectedOption.getAttribute('data-email') : '';
+
+      if (!nama || !email) {
         resetStudentSelection();
         return;
       }
 
-      // Cari padanan dalam muridListData
-      let found = null;
-      for (let i = 0; i < muridListData.length; i++) {
-        if (muridListData[i].nama.toLowerCase() === val) {
-          found = muridListData[i];
-          break;
-        }
-      }
-      if (!found) {
-        // Cuba padanan separa
-        for (let i = 0; i < muridListData.length; i++) {
-          if (muridListData[i].nama.toLowerCase().includes(val)) {
-            found = muridListData[i];
-            break;
-          }
-        }
-      }
-
-      if (found) {
-        if (muridEmail) muridEmail.value = found.email;
-        if (emailDisplay) emailDisplay.textContent = found.email;
-        targetButtons.forEach(btn => btn.disabled = false);
-        if (btnResetPass) {
-          btnResetPass.href = `https://t.me/Sistem_ID_DELIMa_SKPI_bot?start=${encodeURIComponent(found.email)}`;
-        }
-      } else {
-        if (muridEmail) muridEmail.value = '';
-        resetStudentSelection();
-      }
-    }
-
-    if (document.getElementById('muridSearch')) {
-      document.getElementById('muridSearch').addEventListener('input', handleMuridSearch);
-      document.getElementById('muridSearch').addEventListener('change', handleMuridSearch);
-    }
-
-    // LISTENER PILIH MURID + SUNTIK ID PENUH KE BOT TELEGRAM
-    const muridOld = document.getElementById('murid');
-    if (muridOld) {
-      muridOld.addEventListener('change', function() {
-        let email = this.value;
-        let emailDisplay = document.getElementById('emailDisplay');
-        let targetButtons = document.querySelectorAll('.btn-target');
-        let btnResetPass = document.getElementById('btnResetPass');
-
-        if (email) {
-          emailDisplay.textContent = email;
-          targetButtons.forEach(btn => btn.disabled = false);
-
-          // Hantar e-mel PENUH (bersama @moe-dl.edu.my) ke Bot Telegram Reset Password
-          if (btnResetPass) {
-            btnResetPass.href = `https://t.me/Sistem_ID_DELIMa_SKPI_bot?start=${encodeURIComponent(email)}`;
-          }
-        } else {
-          resetStudentSelection();
-        }
-      });
+      applySelectedStudent({ nama: nama, email: email });
     }
 
     function resetStudentSelection() {
@@ -777,6 +772,8 @@
       if (tahunSelect) tahunSelect.disabled = true;
       if (kelasSelect) kelasSelect.disabled = true;
       if (muridSearch) muridSearch.disabled = true;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = true;
       if (muridSelect) muridSelect.disabled = true;
       document.querySelectorAll('.btn-target').forEach(btn => {
         btn.disabled = true;
@@ -792,7 +789,9 @@
       if (tahunSelect) tahunSelect.disabled = false;
       if (kelasSelect && kelasSelect.options.length > 1) kelasSelect.disabled = false;
       if (muridSearch && muridEmail && muridEmail.value) {
-        // enable if email selected
+        muridSearch.disabled = false;
+          const muridFilter = document.getElementById('muridFilter');
+          if (muridFilter) muridFilter.disabled = false;
       }
       document.querySelectorAll('.btn-target').forEach(btn => {
         btn.classList.remove('pointer-events-none', 'opacity-60');
@@ -827,7 +826,8 @@
           "&app=" + encodeURIComponent(targetKey) +
           "&source=Web App";
 
-        fetch(logUrl, { mode: 'no-cors' }).catch(() => {});
+        fetch(logUrl, { mode: 'no-cors' }).then(() => { flushLogQueue(); }).catch(() => { queueLogUrl(logUrl); });
+         flushLogQueue();
 
         // 2. Salin e-mel ke papan klip automatik
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -860,7 +860,8 @@
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
+        flushLogQueue();
+         navigator.serviceWorker.register('./sw.js')
           .then(reg => console.log('Service Worker Berjaya Didaftarkan:', reg.scope))
           .catch(err => console.error('Pendaftaran Service Worker Gagal:', err));
       });
