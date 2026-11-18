@@ -30,7 +30,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$sc = $ws.CreateShortcut($desktop + '\Hub Akses Digital SKPI.lnk'); " ^
   "$sc.TargetPath = '%DEST%\JALANKAN-SKPI.bat'; " ^
   "$sc.WorkingDirectory = '%DEST%'; " ^
-  "$sc.IconLocation = '%DEST%\icon-192.png,0'; " ^
+  "$sc.IconLocation = '%DEST%\icon.ico,0'; " ^
   "$sc.Description = 'Hub Akses Digital SKPI - Portal SSO'; " ^
   "$sc.Save(); " ^
   "Write-Host ('Shortcut dicipta di: ' + $desktop)"
@@ -50,7 +50,7 @@ if exist "%STARTMENU%" (
       "$sc = $ws.CreateShortcut($sm + '\Hub Akses Digital SKPI.lnk'); " ^
       "$sc.TargetPath = '%DEST%\JALANKAN-SKPI.bat'; " ^
       "$sc.WorkingDirectory = '%DEST%'; " ^
-      "$sc.IconLocation = '%DEST%\icon-192.png,0'; " ^
+      "$sc.IconLocation = '%DEST%\icon.ico,0'; " ^
       "$sc.Description = 'Hub Akses Digital SKPI - Portal SSO'; " ^
       "$sc.Save()" >nul 2>&1
 )
